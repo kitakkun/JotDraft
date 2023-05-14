@@ -1,0 +1,26 @@
+package com.github.kitakkun.noteapp.ui.navigation
+
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import com.github.kitakkun.noteapp.ui.page.edit.NoteEditPage
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
+
+@Composable
+fun PageRouter(
+    navController: NavHostController,
+) {
+    NavHost(
+        navController = navController,
+        startDestination = "noteEdit",
+    ) {
+        composable("noteList") {
+//            NoteListPage()
+        }
+        composable("noteEdit") {
+            NoteEditPage(viewModel = koinViewModel() { parametersOf() })
+        }
+    }
+}
