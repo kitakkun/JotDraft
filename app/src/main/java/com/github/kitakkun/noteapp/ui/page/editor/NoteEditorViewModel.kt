@@ -19,19 +19,13 @@ class NoteEditorViewModel(
 
     fun updateBaseTextFormat(baseStyle: BaseDocumentTextStyle) {
         mutableUiState.value = uiState.value.copy(
-            baseFormatSpans = listOf(
+            baseStyles = listOf(
                 AnnotatedString.Range(
                     item = baseStyle,
                     start = 0,
                     end = uiState.value.rawContent.length,
                 )
             )
-        )
-    }
-
-    fun insertBoldSpanStart(index: Int) {
-        mutableUiState.value = uiState.value.copy(
-            boldSpans = uiState.value.boldSpans + listOf(index..index)
         )
     }
 

@@ -8,35 +8,20 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.kitakkun.noteapp.ui.page.editor.composable.EditorTopBar
 import com.github.kitakkun.noteapp.ui.page.editor.composable.TextStyleConfig
 import com.github.kitakkun.noteapp.ui.page.editor.composable.TextStyleControlRow
+import com.github.kitakkun.noteapp.ui.page.editor.ext.applyDocumentBaseTextStyle
+import com.github.kitakkun.noteapp.ui.page.editor.ext.applyOverrideTextStyle
 import com.github.kitakkun.noteapp.ui.preview.PreviewContainer
 
 private fun buildStyledText(text: AnnotatedString) = buildAnnotatedString {
-}
-
-// just for reference
-fun buildAnnotatedStringWithColors(text: String): AnnotatedString {
-    val words: List<String> = text.split("\\s+".toRegex())// splits by whitespace
-    val colors = listOf(Color.Red, Color.Black, Color.Yellow, Color.Blue)
-    var count = 0
-
-    val builder = AnnotatedString.Builder()
-    for (word in words) {
-        builder.withStyle(style = SpanStyle(color = colors[count % 4])) {
-            append("$word ")
-        }
-        count++
-    }
-    return builder.toAnnotatedString()
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,13 +54,13 @@ fun NoteEditorView(
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp)
                     .weight(1f),
-//           TODO: WIP
-//            visualTransformation = {
-//                TransformedText(
-//                    buildAnnotatedStringWithColors(it.text),
-//                    OffsetMapping.Identity,
-//                )
-//            }
+                visualTransformation = {
+                    TransformedText(
+                        text = it.applyDocumentBaseTextStyle(baseFormats = uiState.baseStyles)
+                            .applyOverrideTextStyle(overrideFormats = uiState.overrideStyles),
+                        offsetMapping = OffsetMapping.Identity,
+                    )
+                }
             )
             TextStyleControlRow(
                 config = TextStyleConfig(),
