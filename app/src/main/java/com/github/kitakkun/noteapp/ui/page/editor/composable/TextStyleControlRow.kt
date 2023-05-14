@@ -40,7 +40,7 @@ fun TextStyleControlRow(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = config.baseFormat.toString(),
+            text = config.baseStyle.toString(),
             modifier = Modifier
                 .width(200.dp)
                 .border(

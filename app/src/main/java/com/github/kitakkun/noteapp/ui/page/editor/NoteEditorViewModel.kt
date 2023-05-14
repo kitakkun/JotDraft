@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.github.kitakkun.noteapp.data.DocumentRepository
-import com.github.kitakkun.noteapp.ui.page.editor.editmodel.BaseTextFormat
+import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.BaseDocumentTextStyle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -17,11 +17,11 @@ class NoteEditorViewModel(
     private val mutableUiState = MutableStateFlow(NoteEditorUiState())
     val uiState = mutableUiState.asStateFlow()
 
-    fun updateBaseTextFormat(baseTextFormat: BaseTextFormat) {
+    fun updateBaseTextFormat(baseStyle: BaseDocumentTextStyle) {
         mutableUiState.value = uiState.value.copy(
             baseFormatSpans = listOf(
                 AnnotatedString.Range(
-                    item = baseTextFormat,
+                    item = baseStyle,
                     start = 0,
                     end = uiState.value.rawContent.length,
                 )

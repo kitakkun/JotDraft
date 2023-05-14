@@ -4,16 +4,16 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
-import com.github.kitakkun.noteapp.ui.page.editor.editmodel.BaseTextFormat
+import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.BaseDocumentTextStyle
 
 class StyleApplier : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
         TODO("Not yet implemented")
     }
 
-    private fun applyBaseFormat(
+    private fun applyDocumentBaseTextStyle(
         annotatedString: AnnotatedString,
-        baseFormats: List<AnnotatedString.Range<BaseTextFormat>>,
+        baseFormats: List<AnnotatedString.Range<BaseDocumentTextStyle>>,
     ) = buildAnnotatedString {
         append(text = annotatedString.text)
         annotatedString.spanStyles.forEach {
