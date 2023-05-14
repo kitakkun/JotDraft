@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.ui.page.edit.composable
+package com.github.kitakkun.noteapp.ui.page.editor.composable
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable

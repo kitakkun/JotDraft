@@ -1,15 +1,15 @@
-package com.github.kitakkun.noteapp.ui.page.edit
+package com.github.kitakkun.noteapp.ui.page.editor
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 
 @Composable
-fun NoteEditPage(
-    viewModel: NoteEditViewModel,
+fun NoteEditorPage(
+    viewModel: NoteEditorViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    NoteEditView(
+    NoteEditorView(
         uiState = uiState,
         onContentChange = viewModel::updateRawContent,
         onBoldChange = {},

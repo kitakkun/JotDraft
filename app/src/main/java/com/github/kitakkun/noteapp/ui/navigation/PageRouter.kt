@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.github.kitakkun.noteapp.ui.page.edit.NoteEditPage
+import com.github.kitakkun.noteapp.ui.page.editor.NoteEditorPage
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -20,7 +20,7 @@ fun PageRouter(
 //            NoteListPage()
         }
         composable("noteEdit") {
-            NoteEditPage(viewModel = koinViewModel() { parametersOf() })
+            NoteEditorPage(viewModel = koinViewModel() { parametersOf() })
         }
     }
 }

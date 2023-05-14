@@ -1,7 +1,7 @@
-package com.github.kitakkun.noteapp.ui.page.edit.composable
+package com.github.kitakkun.noteapp.ui.page.editor.composable
 
 import androidx.compose.ui.graphics.Color
-import com.github.kitakkun.noteapp.ui.page.edit.editmodel.BaseTextFormat
+import com.github.kitakkun.noteapp.ui.page.editor.editmodel.BaseTextFormat
 
 data class TextStyleConfig(
     val baseFormat: BaseTextFormat = BaseTextFormat.Body,

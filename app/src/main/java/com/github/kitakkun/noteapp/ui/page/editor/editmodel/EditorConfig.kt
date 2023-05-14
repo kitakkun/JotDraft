@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.ui.page.edit.editmodel
+package com.github.kitakkun.noteapp.ui.page.editor.editmodel
 
 data class EditorConfig(
     val baseTextFormat: BaseTextFormat,

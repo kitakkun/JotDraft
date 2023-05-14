@@ -1,20 +1,20 @@
-package com.github.kitakkun.noteapp.ui.page.edit
+package com.github.kitakkun.noteapp.ui.page.editor
 
 import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.github.kitakkun.noteapp.data.DocumentRepository
-import com.github.kitakkun.noteapp.ui.page.edit.editmodel.BaseTextFormat
+import com.github.kitakkun.noteapp.ui.page.editor.editmodel.BaseTextFormat
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class NoteEditViewModel(
+class NoteEditorViewModel(
     private val documentRepository: DocumentRepository,
     private val navController: NavController,
 ) : ViewModel() {
-    private val mutableUiState = MutableStateFlow(NoteEditUIState())
+    private val mutableUiState = MutableStateFlow(NoteEditorUiState())
     val uiState = mutableUiState.asStateFlow()
 
     fun updateBaseTextFormat(baseTextFormat: BaseTextFormat) {

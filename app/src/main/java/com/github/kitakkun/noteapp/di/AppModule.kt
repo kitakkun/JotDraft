@@ -3,7 +3,7 @@ package com.github.kitakkun.noteapp.di
 import androidx.room.Room
 import com.github.kitakkun.noteapp.data.DocumentDatabase
 import com.github.kitakkun.noteapp.data.DocumentRepository
-import com.github.kitakkun.noteapp.ui.page.edit.NoteEditViewModel
+import com.github.kitakkun.noteapp.ui.page.editor.NoteEditorViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.singleOf
@@ -19,5 +19,5 @@ val appModule = module {
         ).build()
     }
     single { get<DocumentDatabase>().documentDao() }
-    viewModelOf(::NoteEditViewModel)
+    viewModelOf(::NoteEditorViewModel)
 }

@@ -1,10 +1,10 @@
-package com.github.kitakkun.noteapp.ui.page.edit
+package com.github.kitakkun.noteapp.ui.page.editor
 
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
-import com.github.kitakkun.noteapp.ui.page.edit.editmodel.BaseTextFormat
+import com.github.kitakkun.noteapp.ui.page.editor.editmodel.BaseTextFormat
 
 class StyleApplier : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {

@@ -1,9 +1,9 @@
-package com.github.kitakkun.noteapp.ui.page.edit
+package com.github.kitakkun.noteapp.ui.page.editor
 
 import androidx.compose.ui.text.AnnotatedString
-import com.github.kitakkun.noteapp.ui.page.edit.editmodel.BaseTextFormat
+import com.github.kitakkun.noteapp.ui.page.editor.editmodel.BaseTextFormat
 
-data class NoteEditUIState(
+data class NoteEditorUiState(
     val documentTitle: String = "Untitled",
     val isBold: Boolean = false,
     val isItalic: Boolean = false,

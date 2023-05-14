@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.ui.page.edit.editmodel
+package com.github.kitakkun.noteapp.ui.page.editor.editmodel
 
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.unit.TextUnit

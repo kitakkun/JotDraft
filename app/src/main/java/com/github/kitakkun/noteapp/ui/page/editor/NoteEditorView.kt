@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.ui.page.edit
+package com.github.kitakkun.noteapp.ui.page.editor
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,9 +15,9 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.github.kitakkun.noteapp.ui.page.edit.composable.EditorTopBar
-import com.github.kitakkun.noteapp.ui.page.edit.composable.TextStyleConfig
-import com.github.kitakkun.noteapp.ui.page.edit.composable.TextStyleControlRow
+import com.github.kitakkun.noteapp.ui.page.editor.composable.EditorTopBar
+import com.github.kitakkun.noteapp.ui.page.editor.composable.TextStyleConfig
+import com.github.kitakkun.noteapp.ui.page.editor.composable.TextStyleControlRow
 import com.github.kitakkun.noteapp.ui.preview.PreviewContainer
 
 private fun buildStyledText(text: AnnotatedString) = buildAnnotatedString {
@@ -41,8 +41,8 @@ fun buildAnnotatedStringWithColors(text: String): AnnotatedString {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NoteEditView(
-    uiState: NoteEditUIState,
+fun NoteEditorView(
+    uiState: NoteEditorUiState,
     onContentChange: (String) -> Unit,
     onBoldChange: (Boolean) -> Unit,
     onItalicChange: (Boolean) -> Unit,
@@ -90,9 +90,9 @@ fun NoteEditView(
 
 @Preview
 @Composable
-private fun NoteEditViewPreview() = PreviewContainer {
-    NoteEditView(
-        uiState = NoteEditUIState(),
+private fun NoteEditorViewPreview() = PreviewContainer {
+    NoteEditorView(
+        uiState = NoteEditorUiState(),
         onContentChange = {},
         onItalicChange = {},
         onBaseTextFormatClick = {},
