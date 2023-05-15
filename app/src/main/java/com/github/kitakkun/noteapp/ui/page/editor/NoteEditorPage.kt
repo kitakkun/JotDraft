@@ -17,7 +17,10 @@ fun NoteEditorPage(
         onBaseTextFormatClick = viewModel::showSelectBaseDocumentTextStyleDialog,
         onSaveClick = viewModel::saveDocument,
         onNavigateUpClick = viewModel::navigateUp,
-        onBaseStyleChange = viewModel::updateBaseStyle,
+        onBaseStyleChange = {
+            viewModel.updateBaseStyle(it)
+            viewModel.dismissSelectBaseDocumentTextStyleDialog()
+        },
         onDismissSelectBaseDocumentTextStyleDialog = viewModel::dismissSelectBaseDocumentTextStyleDialog,
     )
 }
