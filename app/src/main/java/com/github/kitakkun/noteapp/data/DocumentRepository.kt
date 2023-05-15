@@ -34,4 +34,8 @@ class DocumentRepository(
         title: String,
     ) = withContext(Dispatchers.IO) {
     }
+
+    suspend fun fetchDocuments() = withContext(Dispatchers.IO) {
+        documentDao.getAll()
+    }
 }
