@@ -31,6 +31,7 @@ fun TextStyleControlRow(
     config: TextStyleConfig,
     onBoldChange: (Boolean) -> Unit,
     onItalicChange: (Boolean) -> Unit,
+    onTextColorIconClick: () -> Unit,
     onBaseTextFormatClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -56,7 +57,7 @@ fun TextStyleControlRow(
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.primary,
         )
-        IconButton(onClick = { /*TODO*/ }) {
+        IconButton(onClick = onTextColorIconClick) {
             Icon(imageVector = Icons.Default.FormatColorText, contentDescription = null)
         }
         IconToggleButton(checked = config.bold, onCheckedChange = onBoldChange) {
@@ -76,5 +77,6 @@ private fun TextStyleControlRowPreview() = PreviewContainer {
         onBoldChange = {},
         onBaseTextFormatClick = {},
         onItalicChange = {},
+        onTextColorIconClick = {},
     )
 }

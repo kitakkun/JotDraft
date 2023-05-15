@@ -21,7 +21,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -40,7 +42,7 @@ import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 fun ColorPickerDialog(
     onDismiss: () -> Unit,
     onCancel: () -> Unit,
-    onColorChange: (Color) -> Unit,
+    onColorConfirm: (Color) -> Unit,
 ) {
     val controller = rememberColorPickerController()
     Dialog(onDismissRequest = onDismiss) {
@@ -61,7 +63,7 @@ fun ColorPickerDialog(
                 IconButton(onClick = onCancel) {
                     Icon(imageVector = Icons.Default.Close, contentDescription = null)
                 }
-                Button(onClick = onCancel) {
+                Button(onClick = { onColorConfirm(controller.selectedColor.value) }) {
                     Text(text = stringResource(R.string.ok))
                     Spacer(modifier = Modifier.width(4.dp))
                     Icon(imageVector = Icons.Default.Check, contentDescription = null)
@@ -73,9 +75,6 @@ fun ColorPickerDialog(
                     .height(450.dp)
                     .padding(10.dp),
                 controller = controller,
-                onColorChanged = { colorEnvelope: ColorEnvelope ->
-                    onColorChange(colorEnvelope.color)
-                }
             )
             AlphaSlider(
                 modifier = Modifier
@@ -101,6 +100,6 @@ private fun ColorPickerDialogPreview() = PreviewContainer {
     ColorPickerDialog(
         onDismiss = {},
         onCancel = {},
-        onColorChange = {},
+        onColorConfirm = {},
     )
 }

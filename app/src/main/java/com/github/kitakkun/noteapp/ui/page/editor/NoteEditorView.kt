@@ -8,6 +8,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TransformedText
@@ -16,7 +17,9 @@ import androidx.compose.ui.unit.dp
 import com.github.kitakkun.noteapp.ui.page.editor.composable.EditorTopBar
 import com.github.kitakkun.noteapp.ui.page.editor.composable.TextStyleConfig
 import com.github.kitakkun.noteapp.ui.page.editor.composable.TextStyleControlRow
+import com.github.kitakkun.noteapp.ui.page.editor.dialog.ColorPickerDialog
 import com.github.kitakkun.noteapp.ui.page.editor.dialog.SelectBaseDocumentTextStyleDialog
+import com.github.kitakkun.noteapp.ui.page.editor.dialog.SelectColorDialog
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.BaseDocumentTextStyle
 import com.github.kitakkun.noteapp.ui.page.editor.ext.applyStyles
 import com.github.kitakkun.noteapp.ui.preview.PreviewContainer
@@ -32,8 +35,30 @@ fun NoteEditorView(
     onNavigateUpClick: () -> Unit,
     onSaveClick: () -> Unit,
     onBaseStyleChange: (BaseDocumentTextStyle) -> Unit,
+    onTextColorIconClick: () -> Unit,
     onDismissSelectBaseDocumentTextStyleDialog: () -> Unit,
+    onDismissColorPickerDialog: () -> Unit,
+    onDismissSelectColorDialog: () -> Unit,
+    onAddColorFinished: (Color) -> Unit,
+    onColorPickerOpenRequest: () -> Unit,
+    onColorSelected: (Color) -> Unit,
 ) {
+    if (uiState.showColorPickerDialog) {
+        ColorPickerDialog(
+            onDismiss = onDismissColorPickerDialog,
+            onCancel = onDismissColorPickerDialog,
+            onColorConfirm = onAddColorFinished,
+        )
+    }
+    if (uiState.showSelectColorDialog) {
+        SelectColorDialog(
+            availableColors = uiState.availableColors,
+            selectedColor = uiState.currentColor,
+            onDismiss = onDismissSelectColorDialog,
+            onColorSelected = onColorSelected,
+            onAddColorClick = onColorPickerOpenRequest,
+        )
+    }
     if (uiState.showSelectBaseDocumentTextStyleDialog) {
         SelectBaseDocumentTextStyleDialog(
             selectedStyle = BaseDocumentTextStyle.Body, // TODO: 仮のもの．あとで置き換える
@@ -75,6 +100,7 @@ fun NoteEditorView(
                 onBoldChange = onBoldChange,
                 onItalicChange = onItalicChange,
                 onBaseTextFormatClick = onBaseTextFormatClick,
+                onTextColorIconClick = onTextColorIconClick,
             )
         }
 
@@ -94,5 +120,11 @@ private fun NoteEditorViewPreview() = PreviewContainer {
         onNavigateUpClick = {},
         onBaseStyleChange = {},
         onDismissSelectBaseDocumentTextStyleDialog = {},
+        onColorSelected = {},
+        onDismissColorPickerDialog = {},
+        onTextColorIconClick = {},
+        onDismissSelectColorDialog = {},
+        onAddColorFinished = {},
+        onColorPickerOpenRequest = {},
     )
 }

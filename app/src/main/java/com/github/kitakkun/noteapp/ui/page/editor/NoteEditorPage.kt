@@ -22,5 +22,17 @@ fun NoteEditorPage(
             viewModel.dismissSelectBaseDocumentTextStyleDialog()
         },
         onDismissSelectBaseDocumentTextStyleDialog = viewModel::dismissSelectBaseDocumentTextStyleDialog,
+        onColorSelected = {
+            viewModel.updateCurrentColor(it)
+            viewModel.dismissSelectColorDialog()
+        },
+        onAddColorFinished = {
+            viewModel.addColor(it)
+            viewModel.dismissColorPickerDialog()
+        },
+        onColorPickerOpenRequest = viewModel::showColorPickerDialog,
+        onDismissColorPickerDialog = viewModel::dismissColorPickerDialog,
+        onDismissSelectColorDialog = viewModel::dismissSelectColorDialog,
+        onTextColorIconClick = viewModel::showSelectColorDialog,
     )
 }

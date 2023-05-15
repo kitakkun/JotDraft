@@ -1,5 +1,6 @@
 package com.github.kitakkun.noteapp.ui.page.editor
 
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -91,6 +92,54 @@ class NoteEditorViewModel(
         mutableUiState.update {
             it.copy(
                 showSelectBaseDocumentTextStyleDialog = true
+            )
+        }
+    }
+
+    fun dismissSelectColorDialog() {
+        mutableUiState.update {
+            it.copy(
+                showSelectColorDialog = false
+            )
+        }
+    }
+
+    fun dismissColorPickerDialog() {
+        mutableUiState.update {
+            it.copy(
+                showColorPickerDialog = false
+            )
+        }
+    }
+
+    fun showColorPickerDialog() {
+        mutableUiState.update {
+            it.copy(
+                showColorPickerDialog = true
+            )
+        }
+    }
+
+    fun addColor(color: Color) {
+        mutableUiState.update {
+            it.copy(
+                availableColors = it.availableColors + color,
+            )
+        }
+    }
+
+    fun updateCurrentColor(color: Color) {
+        mutableUiState.update {
+            it.copy(
+                currentColor = color,
+            )
+        }
+    }
+
+    fun showSelectColorDialog() {
+        mutableUiState.update {
+            it.copy(
+                showSelectColorDialog = true
             )
         }
     }
