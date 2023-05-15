@@ -83,4 +83,5 @@ dependencies {
     implementation "io.insert-koin:koin-androidx-compose:$koin_version"
 
     testImplementation "org.robolectric:robolectric:4.6.1"
+    implementation("com.github.skydoves:colorpicker-compose:1.0.2")
 }
