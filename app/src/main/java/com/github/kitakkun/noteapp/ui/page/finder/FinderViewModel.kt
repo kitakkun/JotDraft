@@ -16,6 +16,6 @@ class FinderViewModel : ViewModel(), KoinComponent {
     // 言ってることとやってることが噛み合ってないのであとで直す
     // 新規ドキュメントを作成して，編集画面に遷移したい
     fun createNewDocument() {
-        navController.navigate("noteEditor")
+        navController.navigate("noteEdit")
     }
 }
