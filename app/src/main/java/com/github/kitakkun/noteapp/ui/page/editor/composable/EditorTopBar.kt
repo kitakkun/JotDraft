@@ -1,12 +1,13 @@
 package com.github.kitakkun.noteapp.ui.page.editor.composable
 
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.NavigateBefore
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
@@ -16,12 +17,17 @@ import com.github.kitakkun.noteapp.ui.preview.PreviewContainer
 @Composable
 fun EditorTopBar(
     title: String,
+    onTitleChange: (String) -> Unit,
     onNavigateBeforeClick: () -> Unit,
     onSaveClick: () -> Unit,
 ) {
     TopAppBar(
         title = {
-            Text(text = title)
+            BasicTextField(
+                value = title,
+                onValueChange = onTitleChange,
+                textStyle = MaterialTheme.typography.titleLarge,
+            )
         },
         navigationIcon = {
             IconButton(onClick = onNavigateBeforeClick) {
@@ -42,6 +48,7 @@ private fun EditorTopBarPreview() = PreviewContainer {
     EditorTopBar(
         title = "Title",
         onNavigateBeforeClick = {},
+        onTitleChange = {},
         onSaveClick = {},
     )
 }

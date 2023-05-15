@@ -34,5 +34,6 @@ fun NoteEditorPage(
         onDismissColorPickerDialog = viewModel::dismissColorPickerDialog,
         onDismissSelectColorDialog = viewModel::dismissSelectColorDialog,
         onTextColorIconClick = viewModel::showSelectColorDialog,
+        onTitleChange = viewModel::updateDocumentTitle,
     )
 }

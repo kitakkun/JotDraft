@@ -23,6 +23,12 @@ class NoteEditorViewModel(
     private val mutableUiState = MutableStateFlow(NoteEditorUiState())
     val uiState = mutableUiState.asStateFlow()
 
+    fun updateDocumentTitle(title: String) {
+        mutableUiState.value = uiState.value.copy(
+            documentTitle = title
+        )
+    }
+
     fun updateContent(content: TextFieldValue) {
         mutableUiState.value = uiState.value.copy(
             content = content

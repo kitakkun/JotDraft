@@ -31,6 +31,7 @@ fun NoteEditorView(
     onContentChange: (TextFieldValue) -> Unit,
     onBoldChange: (Boolean) -> Unit,
     onItalicChange: (Boolean) -> Unit,
+    onTitleChange: (String) -> Unit,
     onBaseTextFormatClick: () -> Unit,
     onNavigateUpClick: () -> Unit,
     onSaveClick: () -> Unit,
@@ -73,6 +74,7 @@ fun NoteEditorView(
                 title = uiState.documentTitle,
                 onNavigateBeforeClick = onNavigateUpClick,
                 onSaveClick = onSaveClick,
+                onTitleChange = onTitleChange,
             )
         }
     ) { innerPadding ->
@@ -127,5 +129,6 @@ private fun NoteEditorViewPreview() = PreviewContainer {
         onDismissSelectColorDialog = {},
         onAddColorFinished = {},
         onColorPickerOpenRequest = {},
+        onTitleChange = {},
     )
 }
