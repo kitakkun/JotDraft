@@ -33,15 +33,11 @@ class NoteEditorViewModel(
     }
 
     fun updateDocumentTitle(title: String) {
-        mutableUiState.value = uiState.value.copy(
-            documentTitle = title
-        )
+        mutableUiState.update { it.copy(documentTitle = title) }
     }
 
     fun updateContent(content: TextFieldValue) {
-        mutableUiState.value = uiState.value.copy(
-            content = content
-        )
+        mutableUiState.update { it.copy(content = content) }
     }
 
     fun saveDocument() = viewModelScope.launch {
@@ -103,11 +99,7 @@ class NoteEditorViewModel(
     }
 
     fun dismissSelectBaseDocumentTextStyleDialog() {
-        mutableUiState.update {
-            it.copy(
-                showSelectBaseDocumentTextStyleDialog = false
-            )
-        }
+        mutableUiState.update { it.copy(showSelectBaseDocumentTextStyleDialog = false) }
     }
 
     fun updateBaseStyle(baseDocumentTextStyle: BaseDocumentTextStyle) {
@@ -115,58 +107,30 @@ class NoteEditorViewModel(
     }
 
     fun showSelectBaseDocumentTextStyleDialog() {
-        mutableUiState.update {
-            it.copy(
-                showSelectBaseDocumentTextStyleDialog = true
-            )
-        }
+        mutableUiState.update { it.copy(showSelectBaseDocumentTextStyleDialog = true) }
     }
 
     fun dismissSelectColorDialog() {
-        mutableUiState.update {
-            it.copy(
-                showSelectColorDialog = false
-            )
-        }
+        mutableUiState.update { it.copy(showSelectColorDialog = false) }
     }
 
     fun dismissColorPickerDialog() {
-        mutableUiState.update {
-            it.copy(
-                showColorPickerDialog = false
-            )
-        }
+        mutableUiState.update { it.copy(showColorPickerDialog = false) }
     }
 
     fun showColorPickerDialog() {
-        mutableUiState.update {
-            it.copy(
-                showColorPickerDialog = true
-            )
-        }
+        mutableUiState.update { it.copy(showColorPickerDialog = true) }
     }
 
     fun addColor(color: Color) {
-        mutableUiState.update {
-            it.copy(
-                availableColors = it.availableColors + color,
-            )
-        }
+        mutableUiState.update { it.copy(availableColors = it.availableColors + color) }
     }
 
     fun updateCurrentColor(color: Color) {
-        mutableUiState.update {
-            it.copy(
-                currentColor = color,
-            )
-        }
+        mutableUiState.update { it.copy(currentColor = color) }
     }
 
     fun showSelectColorDialog() {
-        mutableUiState.update {
-            it.copy(
-                showSelectColorDialog = true
-            )
-        }
+        mutableUiState.update { it.copy(showSelectColorDialog = true) }
     }
 }
