@@ -50,13 +50,13 @@ fun TextStyleControlRow(
                 )
                 .clip(CircleShape)
                 .clickable {
-
+                    onBaseTextFormatClick()
                 }
                 .padding(8.dp),
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.primary,
         )
-        IconButton(onClick = onBaseTextFormatClick) {
+        IconButton(onClick = { /*TODO*/ }) {
             Icon(imageVector = Icons.Default.FormatColorText, contentDescription = null)
         }
         IconToggleButton(checked = config.bold, onCheckedChange = onBoldChange) {

@@ -14,8 +14,10 @@ fun NoteEditorPage(
         onContentChange = viewModel::updateContent,
         onBoldChange = viewModel::setOverrideBoldMode,
         onItalicChange = { /*TODO*/ },
-        onBaseTextFormatClick = {/*TODO*/ },
+        onBaseTextFormatClick = viewModel::showSelectBaseDocumentTextStyleDialog,
         onSaveClick = viewModel::saveDocument,
         onNavigateUpClick = viewModel::navigateUp,
+        onBaseStyleChange = viewModel::updateBaseStyle,
+        onDismissSelectBaseDocumentTextStyleDialog = viewModel::dismissSelectBaseDocumentTextStyleDialog,
     )
 }

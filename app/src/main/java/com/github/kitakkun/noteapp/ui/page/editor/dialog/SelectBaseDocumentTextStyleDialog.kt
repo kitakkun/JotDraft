@@ -26,7 +26,7 @@ fun SelectBaseDocumentTextStyleDialog(
     Dialog(onDismissRequest = onDismissRequest) {
         LazyColumn(
             modifier = Modifier.background(
-                shape = RoundedCornerShape(8.dp),
+                shape = RoundedCornerShape(size = 8.dp),
                 color = MaterialTheme.colorScheme.surface,
             )
         ) {

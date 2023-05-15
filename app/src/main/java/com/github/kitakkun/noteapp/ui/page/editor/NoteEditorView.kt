@@ -16,6 +16,8 @@ import androidx.compose.ui.unit.dp
 import com.github.kitakkun.noteapp.ui.page.editor.composable.EditorTopBar
 import com.github.kitakkun.noteapp.ui.page.editor.composable.TextStyleConfig
 import com.github.kitakkun.noteapp.ui.page.editor.composable.TextStyleControlRow
+import com.github.kitakkun.noteapp.ui.page.editor.dialog.SelectBaseDocumentTextStyleDialog
+import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.BaseDocumentTextStyle
 import com.github.kitakkun.noteapp.ui.page.editor.ext.applyStyles
 import com.github.kitakkun.noteapp.ui.preview.PreviewContainer
 
@@ -29,7 +31,17 @@ fun NoteEditorView(
     onBaseTextFormatClick: () -> Unit,
     onNavigateUpClick: () -> Unit,
     onSaveClick: () -> Unit,
+    onBaseStyleChange: (BaseDocumentTextStyle) -> Unit,
+    onDismissSelectBaseDocumentTextStyleDialog: () -> Unit,
 ) {
+    if (uiState.showSelectBaseDocumentTextStyleDialog) {
+        SelectBaseDocumentTextStyleDialog(
+            selectedStyle = BaseDocumentTextStyle.Body, // TODO: 仮のもの．あとで置き換える
+            onSelectStyle = onBaseStyleChange,
+            onDismissRequest = onDismissSelectBaseDocumentTextStyleDialog,
+        )
+    }
+
     Scaffold(
         topBar = {
             EditorTopBar(
@@ -80,5 +92,7 @@ private fun NoteEditorViewPreview() = PreviewContainer {
         onBoldChange = {},
         onSaveClick = {},
         onNavigateUpClick = {},
+        onBaseStyleChange = {},
+        onDismissSelectBaseDocumentTextStyleDialog = {},
     )
 }

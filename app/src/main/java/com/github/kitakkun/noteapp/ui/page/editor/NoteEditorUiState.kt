@@ -12,4 +12,6 @@ data class NoteEditorUiState(
 
     val baseStyleAnchors: List<StyleAnchor> = emptyList(),
     val overrideStyles: List<StyleAnchor> = emptyList(),
+
+    val showSelectBaseDocumentTextStyleDialog: Boolean = false,
 )

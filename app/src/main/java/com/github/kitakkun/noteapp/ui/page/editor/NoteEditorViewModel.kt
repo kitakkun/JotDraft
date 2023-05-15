@@ -74,4 +74,24 @@ class NoteEditorViewModel(
             })
         }
     }
+
+    fun dismissSelectBaseDocumentTextStyleDialog() {
+        mutableUiState.update {
+            it.copy(
+                showSelectBaseDocumentTextStyleDialog = false
+            )
+        }
+    }
+
+    fun updateBaseStyle(baseDocumentTextStyle: BaseDocumentTextStyle) {
+        // do something later
+    }
+
+    fun showSelectBaseDocumentTextStyleDialog() {
+        mutableUiState.update {
+            it.copy(
+                showSelectBaseDocumentTextStyleDialog = true
+            )
+        }
+    }
 }
