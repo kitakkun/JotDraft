@@ -40,4 +40,8 @@ class DocumentRepository(
     suspend fun fetchDocuments() = withContext(Dispatchers.IO) {
         documentDao.getAll()
     }
+
+    suspend fun getDocumentById(documentId: String?) = withContext(Dispatchers.IO) {
+        documentDao.getById(documentId)
+    }
 }

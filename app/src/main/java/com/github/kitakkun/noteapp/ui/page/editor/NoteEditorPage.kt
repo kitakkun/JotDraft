@@ -1,6 +1,7 @@
 package com.github.kitakkun.noteapp.ui.page.editor
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 
@@ -9,6 +10,11 @@ fun NoteEditorPage(
     viewModel: NoteEditorViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchDocumentData()
+    }
+
     NoteEditorView(
         uiState = uiState,
         onContentChange = viewModel::updateContent,
