@@ -45,11 +45,19 @@ class NoteEditorViewModel(
     }
 
     fun saveDocument() = viewModelScope.launch {
-        documentRepository.saveDocument(
-            id = UUID.randomUUID().toString(),
-            title = uiState.value.documentTitle,
-            rawContent = uiState.value.content.text,
-        )
+        if (documentId == null) {
+            documentRepository.saveDocument(
+                id = UUID.randomUUID().toString(),
+                title = uiState.value.documentTitle,
+                rawContent = uiState.value.content.text,
+            )
+        } else {
+            documentRepository.updateDocument(
+                id = documentId,
+                title = uiState.value.documentTitle,
+                rawContent = uiState.value.content.text,
+            )
+        }
     }
 
     fun navigateUp() {

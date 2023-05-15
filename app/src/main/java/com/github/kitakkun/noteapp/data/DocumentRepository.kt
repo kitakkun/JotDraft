@@ -21,11 +21,13 @@ class DocumentRepository(
     }
 
     suspend fun updateDocument(
+        id: String,
         title: String,
         rawContent: String,
     ) = withContext(Dispatchers.IO) {
         documentDao.update(
             DocumentEntity(
+                id = id,
                 title = title,
                 content = rawContent,
             )
