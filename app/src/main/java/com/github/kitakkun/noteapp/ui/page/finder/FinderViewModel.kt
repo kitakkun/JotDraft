@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.github.kitakkun.noteapp.data.DocumentRepository
+import com.github.kitakkun.noteapp.ui.navigation.MainPage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -20,6 +21,7 @@ class FinderViewModel(
         mutableUiState.value = uiState.value.copy(
             documents = documents.map { document ->
                 DocumentItemUiState(
+                    id = document.id,
                     title = document.title,
                     createdAtText = "",
                 )
@@ -30,6 +32,10 @@ class FinderViewModel(
     // 言ってることとやってることが噛み合ってないのであとで直す
     // 新規ドキュメントを作成して，編集画面に遷移したい
     fun createNewDocument() {
-        navController.navigate("noteEdit")
+        navController.navigate(MainPage.Editor.routeWithArgs(null))
+    }
+
+    fun openDocument(documentId: String) {
+        navController.navigate(MainPage.Editor.routeWithArgs(documentId))
     }
 }

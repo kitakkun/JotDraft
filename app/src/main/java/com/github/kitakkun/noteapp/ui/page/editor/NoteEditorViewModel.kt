@@ -13,8 +13,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class NoteEditorViewModel(
+    private val documentId: String?,
     private val documentRepository: DocumentRepository,
     private val navController: NavController,
 ) : ViewModel() {
@@ -29,6 +31,7 @@ class NoteEditorViewModel(
 
     fun saveDocument() = viewModelScope.launch {
         documentRepository.saveDocument(
+            id = UUID.randomUUID().toString(),
             title = uiState.value.documentTitle,
             rawContent = uiState.value.content.text,
         )

@@ -18,6 +18,6 @@ fun FinderPage(
     FinderView(
         uiState = uiState,
         onAddDocumentClick = viewModel::createNewDocument,
-        onDocumentItemClick = { /*TODO*/ },
+        onDocumentItemClick = viewModel::openDocument,
     )
 }

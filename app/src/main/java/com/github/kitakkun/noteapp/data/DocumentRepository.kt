@@ -7,11 +7,13 @@ class DocumentRepository(
     private val documentDao: DocumentDao
 ) {
     suspend fun saveDocument(
+        id: String,
         title: String,
         rawContent: String,
     ) = withContext(Dispatchers.IO) {
         documentDao.insert(
             DocumentEntity(
+                id = id,
                 title = title,
                 content = rawContent,
             )

@@ -32,8 +32,7 @@ fun FinderView(
             items(uiState.documents) {
                 DocumentItem(
                     uiState = it,
-                    // TODO: 本当はIDにしたい
-                    onClick = { onDocumentItemClick(it.title) }
+                    onClick = { onDocumentItemClick(it.id) }
                 )
             }
         }
