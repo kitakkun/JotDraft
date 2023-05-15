@@ -97,6 +97,7 @@ fun NoteEditorView(
             )
             TextStyleControlRow(
                 config = TextStyleConfig(),
+                color = uiState.currentColor,
                 onBoldChange = onBoldChange,
                 onItalicChange = onItalicChange,
                 onBaseTextFormatClick = onBaseTextFormatClick,

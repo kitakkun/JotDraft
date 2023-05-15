@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,6 +30,7 @@ import com.github.kitakkun.noteapp.ui.preview.PreviewContainer
 @Composable
 fun TextStyleControlRow(
     config: TextStyleConfig,
+    color: Color,
     onBoldChange: (Boolean) -> Unit,
     onItalicChange: (Boolean) -> Unit,
     onTextColorIconClick: () -> Unit,
@@ -58,7 +60,11 @@ fun TextStyleControlRow(
             color = MaterialTheme.colorScheme.primary,
         )
         IconButton(onClick = onTextColorIconClick) {
-            Icon(imageVector = Icons.Default.FormatColorText, contentDescription = null)
+            Icon(
+                imageVector = Icons.Filled.FormatColorText,
+                contentDescription = null,
+                tint = color,
+            )
         }
         IconToggleButton(checked = config.bold, onCheckedChange = onBoldChange) {
             Icon(imageVector = Icons.Default.FormatBold, contentDescription = null)
@@ -73,6 +79,7 @@ fun TextStyleControlRow(
 @Composable
 private fun TextStyleControlRowPreview() = PreviewContainer {
     TextStyleControlRow(
+        color = Color.Red,
         config = TextStyleConfig(),
         onBoldChange = {},
         onBaseTextFormatClick = {},
