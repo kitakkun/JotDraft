@@ -6,8 +6,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 
 interface OverrideDocumentTextStyle : AbstractDocumentTextStyle {
-    abstract val spanStyle: SpanStyle
-
     data class Bold(
         val enabled: Boolean,
     ) : OverrideDocumentTextStyle {

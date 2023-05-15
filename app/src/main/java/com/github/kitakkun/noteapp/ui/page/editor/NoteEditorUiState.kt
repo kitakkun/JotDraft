@@ -1,16 +1,15 @@
 package com.github.kitakkun.noteapp.ui.page.editor
 
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.input.TextFieldValue
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.EditorConfig
-import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.BaseDocumentTextStyle
-import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.OverrideDocumentTextStyle
+import com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor.StyleAnchor
 
 data class NoteEditorUiState(
     val documentTitle: String = "Untitled",
-    val rawContent: String = "",
+    val content: TextFieldValue = TextFieldValue(),
 
     val editorConfig: EditorConfig = EditorConfig(),
 
-    val baseStyles: List<AnnotatedString.Range<BaseDocumentTextStyle>> = emptyList(),
-    val overrideStyles: List<AnnotatedString.Range<OverrideDocumentTextStyle>> = emptyList(),
+    val baseStyleAnchors: List<StyleAnchor> = emptyList(),
+    val overrideStyles: List<StyleAnchor> = emptyList(),
 )

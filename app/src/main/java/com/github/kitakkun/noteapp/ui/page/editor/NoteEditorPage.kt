@@ -11,10 +11,10 @@ fun NoteEditorPage(
     val uiState by viewModel.uiState.collectAsState()
     NoteEditorView(
         uiState = uiState,
-        onContentChange = viewModel::updateRawContent,
-        onBoldChange = {},
-        onItalicChange = {},
-        onBaseTextFormatClick = {},
+        onContentChange = viewModel::updateContent,
+        onBoldChange = viewModel::setOverrideBoldMode,
+        onItalicChange = { /*TODO*/ },
+        onBaseTextFormatClick = {/*TODO*/ },
         onSaveClick = viewModel::saveDocument,
         onNavigateUpClick = viewModel::navigateUp,
     )

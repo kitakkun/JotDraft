@@ -8,27 +8,22 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.kitakkun.noteapp.ui.page.editor.composable.EditorTopBar
 import com.github.kitakkun.noteapp.ui.page.editor.composable.TextStyleConfig
 import com.github.kitakkun.noteapp.ui.page.editor.composable.TextStyleControlRow
-import com.github.kitakkun.noteapp.ui.page.editor.ext.applyDocumentBaseTextStyle
-import com.github.kitakkun.noteapp.ui.page.editor.ext.applyOverrideTextStyle
+import com.github.kitakkun.noteapp.ui.page.editor.ext.applyStyles
 import com.github.kitakkun.noteapp.ui.preview.PreviewContainer
-
-private fun buildStyledText(text: AnnotatedString) = buildAnnotatedString {
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteEditorView(
     uiState: NoteEditorUiState,
-    onContentChange: (String) -> Unit,
+    onContentChange: (TextFieldValue) -> Unit,
     onBoldChange: (Boolean) -> Unit,
     onItalicChange: (Boolean) -> Unit,
     onBaseTextFormatClick: () -> Unit,
@@ -48,7 +43,7 @@ fun NoteEditorView(
             modifier = Modifier.padding(innerPadding)
         ) {
             BasicTextField(
-                value = uiState.rawContent,
+                value = uiState.content,
                 onValueChange = onContentChange,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -56,8 +51,9 @@ fun NoteEditorView(
                     .weight(1f),
                 visualTransformation = {
                     TransformedText(
-                        text = it.applyDocumentBaseTextStyle(baseFormats = uiState.baseStyles)
-                            .applyOverrideTextStyle(overrideFormats = uiState.overrideStyles),
+                        text = it
+                            .applyStyles(styleAnchors = uiState.baseStyleAnchors)
+                            .applyStyles(styleAnchors = uiState.overrideStyles),
                         offsetMapping = OffsetMapping.Identity,
                     )
                 }

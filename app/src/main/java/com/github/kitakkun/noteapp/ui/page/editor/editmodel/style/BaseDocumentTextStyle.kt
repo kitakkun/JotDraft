@@ -26,7 +26,7 @@ enum class BaseDocumentTextStyle(
         letterSpacing = 0.5.sp,
     );
 
-    val spanStyle = SpanStyle(
+    override val spanStyle = SpanStyle(
         fontSize = fontSize,
         letterSpacing = letterSpacing
     )
