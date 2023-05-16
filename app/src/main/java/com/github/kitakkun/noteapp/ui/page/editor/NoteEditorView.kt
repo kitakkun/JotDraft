@@ -15,12 +15,12 @@ import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.kitakkun.noteapp.ui.page.editor.composable.EditorTopBar
-import com.github.kitakkun.noteapp.ui.page.editor.composable.TextStyleConfig
 import com.github.kitakkun.noteapp.ui.page.editor.composable.TextStyleControlRow
 import com.github.kitakkun.noteapp.ui.page.editor.dialog.ColorPickerDialog
 import com.github.kitakkun.noteapp.ui.page.editor.dialog.SelectBaseDocumentTextStyleDialog
 import com.github.kitakkun.noteapp.ui.page.editor.dialog.SelectColorDialog
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.BaseDocumentTextStyle
+import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.OverrideDocumentTextStyle
 import com.github.kitakkun.noteapp.ui.page.editor.ext.applyStyles
 import com.github.kitakkun.noteapp.ui.preview.PreviewContainer
 
@@ -91,14 +91,14 @@ fun NoteEditorView(
                 visualTransformation = {
                     TransformedText(
                         text = it
-                            .applyStyles(styleAnchors = uiState.baseStyleAnchors)
-                            .applyStyles(styleAnchors = uiState.overrideStyles),
+                            .applyStyles(styleAnchors = uiState.styleAnchors.filter { it.style is BaseDocumentTextStyle })
+                            .applyStyles(styleAnchors = uiState.styleAnchors.filter { it.style is OverrideDocumentTextStyle }),
                         offsetMapping = OffsetMapping.Identity,
                     )
                 }
             )
             TextStyleControlRow(
-                config = TextStyleConfig(),
+                config = uiState.editorConfig,
                 color = uiState.currentColor,
                 onBoldChange = onBoldChange,
                 onItalicChange = onItalicChange,

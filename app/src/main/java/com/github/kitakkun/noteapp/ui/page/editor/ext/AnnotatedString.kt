@@ -17,15 +17,3 @@ fun AnnotatedString.applyStyles(styleAnchors: List<StyleAnchor>) = buildAnnotate
         )
     }
 }
-
-fun AnnotatedString.applyStyle(styleAnchor: StyleAnchor) = buildAnnotatedString {
-    append(text = text)
-    spanStyles.forEach {
-        addStyle(it.item, it.start, it.end)
-    }
-    addStyle(
-        style = styleAnchor.style.spanStyle,
-        start = styleAnchor.start,
-        end = styleAnchor.end ?: text.length
-    )
-}

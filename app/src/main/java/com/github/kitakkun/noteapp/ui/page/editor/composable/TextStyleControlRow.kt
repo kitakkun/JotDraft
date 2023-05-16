@@ -25,11 +25,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.github.kitakkun.noteapp.ui.page.editor.editmodel.EditorConfig
 import com.github.kitakkun.noteapp.ui.preview.PreviewContainer
 
 @Composable
 fun TextStyleControlRow(
-    config: TextStyleConfig,
+    config: EditorConfig,
     color: Color,
     onBoldChange: (Boolean) -> Unit,
     onItalicChange: (Boolean) -> Unit,
@@ -66,10 +67,10 @@ fun TextStyleControlRow(
                 tint = color,
             )
         }
-        IconToggleButton(checked = config.bold, onCheckedChange = onBoldChange) {
+        IconToggleButton(checked = config.isBold, onCheckedChange = onBoldChange) {
             Icon(imageVector = Icons.Default.FormatBold, contentDescription = null)
         }
-        IconToggleButton(checked = config.bold, onCheckedChange = onItalicChange) {
+        IconToggleButton(checked = config.isItalic, onCheckedChange = onItalicChange) {
             Icon(imageVector = Icons.Default.FormatItalic, contentDescription = null)
         }
     }
@@ -80,7 +81,7 @@ fun TextStyleControlRow(
 private fun TextStyleControlRowPreview() = PreviewContainer {
     TextStyleControlRow(
         color = Color.Red,
-        config = TextStyleConfig(),
+        config = EditorConfig(),
         onBoldChange = {},
         onBaseTextFormatClick = {},
         onItalicChange = {},
