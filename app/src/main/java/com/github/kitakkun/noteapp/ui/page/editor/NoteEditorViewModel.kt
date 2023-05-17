@@ -1,6 +1,5 @@
 package com.github.kitakkun.noteapp.ui.page.editor
 
-import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
@@ -44,15 +43,11 @@ class NoteEditorViewModel(
     }
 
     fun updateContent(textFieldValue: TextFieldValue) {
-        Log.d(TAG, "${textFieldValue.selection.start}, ${textFieldValue.selection.end}")
+        val oldTextFieldValue = uiState.value.content
         val event = TextFieldEvent.fromTextFieldValueChange(
-            old = uiState.value.content,
+            old = oldTextFieldValue,
             new = textFieldValue,
         )
-        Log.d(TAG, event.toString())
-
-        // update textFieldValue
-        mutableUiState.update { it.copy(content = textFieldValue) }
 
         // update styleAnchors
         when (event) {
@@ -64,8 +59,20 @@ class NoteEditorViewModel(
             is TextFieldEvent.TextDeleted -> {
                 mutableUiState.update {
                     it.copy(styleAnchors = it.styleAnchors
-                        .map { anchor -> anchor.shiftEnd(-event.deletedLength) }
-                        .filter { anchor -> anchor.isValid }
+                        .map { anchor ->
+                            val newStart = if (anchor.start >= oldTextFieldValue.selection.start) {
+                                anchor.start - event.deletedLength
+                            } else {
+                                anchor.start
+                            }
+                            val newEnd = if (anchor.end >= oldTextFieldValue.selection.start) {
+                                anchor.end - event.deletedLength
+                            } else {
+                                anchor.end
+                            }
+                            anchor.copy(start = newStart, end = newEnd)
+                        }
+                        .filter { anchor -> anchor.isValid(textFieldValue.text.length) }
                     )
                 }
             }
@@ -73,8 +80,20 @@ class NoteEditorViewModel(
             is TextFieldEvent.TextInserted -> {
                 mutableUiState.update {
                     it.copy(styleAnchors = it.styleAnchors
-                        .map { anchor -> anchor.shiftEnd(event.insertedLength) }
-                        .filter { anchor -> anchor.isValid }
+                        .map { anchor ->
+                            val newStart = if (anchor.start > oldTextFieldValue.selection.start) {
+                                anchor.start + event.insertedLength
+                            } else {
+                                anchor.start
+                            }
+                            val newEnd = if (anchor.end >= oldTextFieldValue.selection.start) {
+                                anchor.end + event.insertedLength
+                            } else {
+                                anchor.end
+                            }
+                            anchor.copy(start = newStart, end = newEnd)
+                        }
+                        .filter { anchor -> anchor.isValid(textFieldValue.text.length) }
                     )
                 }
             }
@@ -87,25 +106,8 @@ class NoteEditorViewModel(
                 // do nothing
             }
         }
-//        val isStringDeleted = textFieldValue.text.length < prevTextFieldValue.text.length
-//        val cursorPos = textFieldValue.selection.start
-//        val shiftedAnchors = if (isStringDeleted) {
-//            uiState.value.styleAnchors.map {
-//                if (it.end != null && cursorPos in it.start..it.end) {
-//                    it.copy(start = it.start, end = it.end - 1)
-//                } else {
-//                    it
-//                }
-//            }
-//        } else {
-//            uiState.value.styleAnchors.map {
-//                if (it.end != null && cursorPos in it.start..it.end) {
-//                    it.copy(start = it.start, end = it.end + 1)
-//                } else {
-//                    it
-//                }
-//            }
-//        }
+        // update textFieldValue
+        mutableUiState.update { it.copy(content = textFieldValue) }
     }
 
     private fun recalculateStyleAtCursor() {
@@ -143,18 +145,6 @@ class NoteEditorViewModel(
             it.copy(styleAnchors = it.styleAnchors + styleAnchor)
         }
     }
-
-    private fun removeAnchor(style: AbstractDocumentTextStyle) {
-        val styleAnchor = StyleAnchor(
-            start = uiState.value.content.selection.start,
-            end = uiState.value.content.selection.end,
-            style = style,
-        )
-        mutableUiState.update {
-            it.copy(styleAnchors = it.styleAnchors - styleAnchor)
-        }
-    }
-
 
     fun saveDocument() = viewModelScope.launch {
         if (documentId == null) {

@@ -7,7 +7,8 @@ data class StyleAnchor(
     val end: Int,
     val style: AbstractDocumentTextStyle,
 ) {
+    fun shift(shift: Int) = copy(start = start + shift, end = end + shift)
     fun shiftEnd(shift: Int) = copy(end = end + shift)
     fun shiftStart(shift: Int) = copy(start = start + shift)
-    val isValid get() = start <= end
+    fun isValid(textLength: Int) = start <= end && start <= textLength && end <= textLength
 }
