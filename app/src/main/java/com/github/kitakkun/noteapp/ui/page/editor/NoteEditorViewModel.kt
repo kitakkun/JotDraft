@@ -31,7 +31,7 @@ class NoteEditorViewModel(
 
     fun fetchDocumentData() = viewModelScope.launch {
         if (documentId == null) return@launch
-        val document = documentRepository.getDocumentById(documentId)
+        val document = documentRepository.getDocumentById(documentId) ?: return@launch
         mutableUiState.value = uiState.value.copy(
             documentTitle = document.title,
             content = TextFieldValue(document.content),

@@ -25,13 +25,7 @@ fun PageRouter(
             composable(route = MainPage.Editor.routeWithArgs) {
                 val args = MainPage.Editor.resolveArguments(it)
                 val documentId = args[0] as String? ?: ""
-                NoteEditorPage(viewModel = koinViewModel {
-                    if (documentId.isBlank()) {
-                        parametersOf(null)
-                    } else {
-                        parametersOf(documentId)
-                    }
-                })
+                NoteEditorPage(viewModel = koinViewModel { parametersOf(documentId) })
             }
         }
     }
