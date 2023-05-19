@@ -20,7 +20,6 @@ import com.github.kitakkun.noteapp.ui.page.editor.dialog.ColorPickerDialog
 import com.github.kitakkun.noteapp.ui.page.editor.dialog.SelectBaseDocumentTextStyleDialog
 import com.github.kitakkun.noteapp.ui.page.editor.dialog.SelectColorDialog
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.BaseDocumentTextStyle
-import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.OverrideDocumentTextStyle
 import com.github.kitakkun.noteapp.ui.page.editor.ext.applyStyles
 import com.github.kitakkun.noteapp.ui.preview.PreviewContainer
 
@@ -90,9 +89,7 @@ fun NoteEditorView(
                     .weight(1f),
                 visualTransformation = {
                     TransformedText(
-                        text = it
-                            .applyStyles(styleAnchors = uiState.styleAnchors.filter { it.style is BaseDocumentTextStyle })
-                            .applyStyles(styleAnchors = uiState.styleAnchors.filter { it.style is OverrideDocumentTextStyle }),
+                        text = it.applyStyles(styleAnchors = uiState.styleAnchors),
                         offsetMapping = OffsetMapping.Identity,
                     )
                 }

@@ -19,7 +19,7 @@ fun NoteEditorPage(
         uiState = uiState,
         onContentChange = viewModel::updateContent,
         onBoldChange = { viewModel.toggleBold() },
-        onItalicChange = { /*TODO*/ },
+        onItalicChange = { viewModel.toggleItalic() },
         onBaseTextFormatClick = viewModel::showSelectBaseDocumentTextStyleDialog,
         onSaveClick = viewModel::saveDocument,
         onNavigateUpClick = viewModel::navigateUp,

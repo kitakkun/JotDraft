@@ -6,9 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.github.kitakkun.noteapp.data.DocumentRepository
+import com.github.kitakkun.noteapp.ui.page.editor.editmodel.EditorConfig
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.TextFieldEvent
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor.StyleAnchor
-import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.AbstractDocumentTextStyle
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.BaseDocumentTextStyle
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.OverrideDocumentTextStyle
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,65 +49,113 @@ class NoteEditorViewModel(
             new = textFieldValue,
         )
 
-        // update styleAnchors
-        when (event) {
-            is TextFieldEvent.CursorMoved -> {
-                // recalculate insertion style
-                recalculateStyleAtCursor()
+        if (event is TextFieldEvent.TextDeleted) {
+            mutableUiState.update {
+                it.copy(styleAnchors = it.styleAnchors
+                    .map { anchor ->
+                        shiftAnchorLeft(
+                            anchor = anchor,
+                            insertPos = oldTextFieldValue.selection.start,
+                            shiftOffset = event.deletedLength,
+                        )
+                    }
+                    .filter { anchor -> anchor.isValid(textFieldValue.text.length) }
+                )
             }
-
-            is TextFieldEvent.TextDeleted -> {
-                mutableUiState.update {
-                    it.copy(styleAnchors = it.styleAnchors
-                        .map { anchor ->
-                            val newStart = if (anchor.start >= oldTextFieldValue.selection.start) {
-                                anchor.start - event.deletedLength
-                            } else {
-                                anchor.start
-                            }
-                            val newEnd = if (anchor.end >= oldTextFieldValue.selection.start) {
-                                anchor.end - event.deletedLength
-                            } else {
-                                anchor.end
-                            }
-                            anchor.copy(start = newStart, end = newEnd)
-                        }
-                        .filter { anchor -> anchor.isValid(textFieldValue.text.length) }
-                    )
-                }
-            }
-
-            is TextFieldEvent.TextInserted -> {
-                mutableUiState.update {
-                    it.copy(styleAnchors = it.styleAnchors
-                        .map { anchor ->
-                            val newStart = if (anchor.start > oldTextFieldValue.selection.start) {
-                                anchor.start + event.insertedLength
-                            } else {
-                                anchor.start
-                            }
-                            val newEnd = if (anchor.end >= oldTextFieldValue.selection.start) {
-                                anchor.end + event.insertedLength
-                            } else {
-                                anchor.end
-                            }
-                            anchor.copy(start = newStart, end = newEnd)
-                        }
-                        .filter { anchor -> anchor.isValid(textFieldValue.text.length) }
-                    )
-                }
-            }
-
-            is TextFieldEvent.TextUnselected -> {
-                // recalculate insertion style
-            }
-
-            else -> {
-                // do nothing
+        } else if (event is TextFieldEvent.TextInserted) {
+            val editorConfig = uiState.value.editorConfig
+            val styleAnchorsToInsert = generateAnchorsToInsert(
+                editorConfig = editorConfig,
+                insertPos = oldTextFieldValue.selection.start,
+            )
+            mutableUiState.update {
+                it.copy(styleAnchors = (it.styleAnchors + styleAnchorsToInsert)
+                    .map { anchor ->
+                        shiftAnchorRight(
+                            anchor = anchor,
+                            insertPos = oldTextFieldValue.selection.start,
+                            shiftOffset = event.insertedLength,
+                            editorConfig = editorConfig,
+                        )
+                    }
+                    .filter { anchor -> anchor.isValid(textFieldValue.text.length) }
+                )
             }
         }
         // update textFieldValue
         mutableUiState.update { it.copy(content = textFieldValue) }
+        recalculateStyleAtCursor()
+    }
+
+    private fun generateAnchorsToInsert(
+        editorConfig: EditorConfig,
+        insertPos: Int,
+    ): List<StyleAnchor> {
+        val anchorsToInsert = mutableListOf<StyleAnchor>()
+        if (editorConfig.isBold) {
+            anchorsToInsert.add(
+                StyleAnchor(
+                    start = insertPos,
+                    end = insertPos,
+                    style = OverrideDocumentTextStyle.Bold(true),
+                )
+            )
+        }
+        if (editorConfig.isItalic) {
+            anchorsToInsert.add(
+                StyleAnchor(
+                    start = insertPos,
+                    end = insertPos,
+                    style = OverrideDocumentTextStyle.Italic(true),
+                )
+            )
+        }
+        return anchorsToInsert
+    }
+
+    private fun shiftAnchorLeft(
+        anchor: StyleAnchor,
+        insertPos: Int,
+        shiftOffset: Int,
+    ): StyleAnchor {
+        val shouldShiftStart = anchor.start >= insertPos
+        val shouldShiftEnd = anchor.end >= insertPos
+        val newStart = when (shouldShiftStart) {
+            true -> anchor.start - shiftOffset
+            false -> anchor.start
+        }
+        val newEnd = when (shouldShiftEnd) {
+            true -> anchor.end - shiftOffset
+            false -> anchor.end
+        }
+        return anchor.copy(start = newStart, end = newEnd)
+    }
+
+    private fun shiftAnchorRight(
+        anchor: StyleAnchor,
+        insertPos: Int,
+        shiftOffset: Int,
+        editorConfig: EditorConfig,
+    ): StyleAnchor {
+        val shouldShiftStart = anchor.start > insertPos
+        val shouldShiftEnd = anchor.end >= insertPos &&
+                when (anchor.style) {
+                    is OverrideDocumentTextStyle.Bold -> editorConfig.isBold
+                    is OverrideDocumentTextStyle.Italic -> editorConfig.isItalic
+                    else -> true
+                }
+        val newStart = when (shouldShiftStart) {
+            true -> anchor.start + shiftOffset
+            false -> anchor.start
+        }
+        val newEnd = when (shouldShiftEnd) {
+            true -> anchor.end + shiftOffset
+            false -> anchor.end
+        }
+        return anchor.copy(
+            start = newStart,
+            end = newEnd
+        )
     }
 
     private fun recalculateStyleAtCursor() {
@@ -131,18 +179,11 @@ class NoteEditorViewModel(
         mutableUiState.update {
             it.copy(editorConfig = it.editorConfig.copy(isBold = !it.editorConfig.isBold))
         }
-        insertAnchor(OverrideDocumentTextStyle.Bold(enabled = uiState.value.editorConfig.isBold))
     }
 
-    private fun insertAnchor(style: AbstractDocumentTextStyle) {
-        val selection = uiState.value.content.selection
-        val styleAnchor = StyleAnchor(
-            start = selection.start,
-            end = selection.end,
-            style = style,
-        )
+    fun toggleItalic() {
         mutableUiState.update {
-            it.copy(styleAnchors = it.styleAnchors + styleAnchor)
+            it.copy(editorConfig = it.editorConfig.copy(isItalic = !it.editorConfig.isItalic))
         }
     }
 
