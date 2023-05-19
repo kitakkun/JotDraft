@@ -6,8 +6,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 
 @Composable
-fun NoteEditorPage(
-    viewModel: NoteEditorViewModel,
+fun EditorPage(
+    viewModel: EditorViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -15,7 +15,7 @@ fun NoteEditorPage(
         viewModel.fetchDocumentData()
     }
 
-    NoteEditorView(
+    EditorView(
         uiState = uiState,
         onContentChange = viewModel::updateContent,
         onBoldChange = { viewModel.toggleBold() },

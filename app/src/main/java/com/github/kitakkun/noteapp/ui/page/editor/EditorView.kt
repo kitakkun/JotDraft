@@ -25,8 +25,8 @@ import com.github.kitakkun.noteapp.ui.preview.PreviewContainer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NoteEditorView(
-    uiState: NoteEditorUiState,
+fun EditorView(
+    uiState: EditorUiState,
     onContentChange: (TextFieldValue) -> Unit,
     onBoldChange: (Boolean) -> Unit,
     onItalicChange: (Boolean) -> Unit,
@@ -110,8 +110,8 @@ fun NoteEditorView(
 @Preview
 @Composable
 private fun NoteEditorViewPreview() = PreviewContainer {
-    NoteEditorView(
-        uiState = NoteEditorUiState(),
+    EditorView(
+        uiState = EditorUiState(),
         onContentChange = {},
         onItalicChange = {},
         onBaseTextFormatClick = {},

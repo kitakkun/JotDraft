@@ -17,16 +17,16 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
 
-class NoteEditorViewModel(
+class EditorViewModel(
     private val documentId: String?,
     private val documentRepository: DocumentRepository,
     private val navController: NavController,
 ) : ViewModel() {
     companion object {
-        private const val TAG = "NoteEditorViewModel"
+        private const val TAG = "EditorViewModel"
     }
 
-    private val mutableUiState = MutableStateFlow(NoteEditorUiState())
+    private val mutableUiState = MutableStateFlow(EditorUiState())
     val uiState = mutableUiState.asStateFlow()
 
     fun fetchDocumentData() = viewModelScope.launch {

@@ -5,7 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.github.kitakkun.noteapp.ui.page.editor.NoteEditorPage
+import com.github.kitakkun.noteapp.ui.page.editor.EditorPage
 import com.github.kitakkun.noteapp.ui.page.finder.FinderPage
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -25,10 +25,10 @@ fun PageRouter(
             composable(route = MainPage.Editor.routeWithArgs) {
                 val args = MainPage.Editor.resolveArguments(it)
                 val documentId = args[0] as String?
-                NoteEditorPage(viewModel = koinViewModel { parametersOf(documentId) })
+                EditorPage(viewModel = koinViewModel { parametersOf(documentId) })
             }
             composable(route = MainPage.Editor.route) {
-                NoteEditorPage(viewModel = koinViewModel { parametersOf(null) })
+                EditorPage(viewModel = koinViewModel { parametersOf(null) })
             }
         }
     }
