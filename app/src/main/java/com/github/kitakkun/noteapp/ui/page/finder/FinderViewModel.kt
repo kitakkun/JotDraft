@@ -32,7 +32,7 @@ class FinderViewModel(
     // 言ってることとやってることが噛み合ってないのであとで直す
     // 新規ドキュメントを作成して，編集画面に遷移したい
     fun createNewDocument() {
-        navController.navigate(MainPage.Editor.routeWithArgs(null))
+        navController.navigate(MainPage.Editor.route)
     }
 
     fun openDocument(documentId: String) {
