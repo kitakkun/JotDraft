@@ -20,15 +20,15 @@ fun PageRouter(
     ) {
         navigation(route = MainPage.route, startDestination = MainPage.Finder.route) {
             composable(route = MainPage.Finder.route) {
-                FinderPage(viewModel = koinViewModel())
+                FinderPage(viewModel = koinViewModel() { parametersOf(navController) })
             }
             composable(route = MainPage.Editor.routeWithArgs) {
                 val args = MainPage.Editor.resolveArguments(it)
                 val documentId = args[0] as String?
-                EditorPage(viewModel = koinViewModel { parametersOf(documentId) })
+                EditorPage(viewModel = koinViewModel { parametersOf(documentId, navController) })
             }
             composable(route = MainPage.Editor.route) {
-                EditorPage(viewModel = koinViewModel { parametersOf(null) })
+                EditorPage(viewModel = koinViewModel { parametersOf(null, navController) })
             }
         }
     }
