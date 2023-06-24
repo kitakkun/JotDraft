@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.ui.page.editor.dialog
+package com.github.kitakkun.noteapp.ui.page.editor.dialog.colorselect
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
