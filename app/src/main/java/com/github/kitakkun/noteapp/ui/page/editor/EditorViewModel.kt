@@ -1,5 +1,6 @@
 package com.github.kitakkun.noteapp.ui.page.editor
 
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
@@ -7,10 +8,12 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.github.kitakkun.noteapp.data.DocumentRepository
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.EditorConfig
-import com.github.kitakkun.noteapp.ui.page.editor.editmodel.TextFieldEvent
+import com.github.kitakkun.noteapp.ui.page.editor.editmodel.TextFieldChangeEvent
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor.StyleAnchor
+import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.AbstractDocumentTextStyle
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.BaseDocumentTextStyle
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.OverrideDocumentTextStyle
+import com.github.kitakkun.noteapp.ui.page.editor.ext.applyStyles
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -42,61 +45,125 @@ class EditorViewModel(
         mutableUiState.update { it.copy(documentTitle = title) }
     }
 
-    fun updateContent(textFieldValue: TextFieldValue) {
+    fun updateContent(newTextFieldValue: TextFieldValue) {
+        // テキストの削除や追加に応じて，適切にスタイルアンカーを更新し，最後にスタイルを適用したTextFieldValueをUIStateに反映する
         val oldTextFieldValue = uiState.value.content
-        val event = TextFieldEvent.fromTextFieldValueChange(
+        val event = TextFieldChangeEvent.fromTextFieldValueChange(
             old = oldTextFieldValue,
-            new = textFieldValue,
+            new = newTextFieldValue,
         )
 
-        if (event is TextFieldEvent.TextDeleted) {
-            mutableUiState.update {
-                it.copy(styleAnchors = it.styleAnchors
-                    .map { anchor ->
-                        shiftAnchorLeft(
-                            anchor = anchor,
-                            insertPos = oldTextFieldValue.selection.start,
-                            shiftOffset = event.deletedLength,
-                        )
-                    }
-                    .filter { anchor -> anchor.isValid(textFieldValue.text.length) }
+        val insertionStyles = listOf(
+            OverrideDocumentTextStyle.Bold(uiState.value.editorConfig.isBold),
+            OverrideDocumentTextStyle.Italic(uiState.value.editorConfig.isItalic),
+        )
+
+        val newAnchors = when (event) {
+            is TextFieldChangeEvent.Insert -> {
+                // insert new anchors which should be inserted
+                val insertedAnchors = generateAnchorsToInsert(
+                    editorConfig = uiState.value.editorConfig,
+                    insertPos = event.position,
+                    length = event.length,
                 )
-            }
-        } else if (event is TextFieldEvent.TextInserted) {
-            val editorConfig = uiState.value.editorConfig
-            val styleAnchorsToInsert = generateAnchorsToInsert(
-                editorConfig = editorConfig,
-                insertPos = oldTextFieldValue.selection.start,
-            )
-            mutableUiState.update {
-                it.copy(styleAnchors = (it.styleAnchors + styleAnchorsToInsert)
-                    .map { anchor ->
+                val shiftedAnchors = uiState.value.styleAnchors
+                    .flatMap {
+                        // 違うスタイルのものを現在のカーソル位置に挿入する場合，
+                        // 挿入点を堺に適切にスタイルアンカーを分割する必要がある
+                        val splitted = splitAnchorsIfNeeded(
+                            anchor = it,
+                            baseline = event.position,
+                            currentInsertionStyles = insertionStyles,
+                        )
+                        if (splitted.size == 2) {
+                            Log.d(TAG, "split anchor: $it -> $splitted")
+                        }
+                        splitted
+                    }
+                    .map {
                         shiftAnchorRight(
-                            anchor = anchor,
-                            insertPos = oldTextFieldValue.selection.start,
-                            shiftOffset = event.insertedLength,
-                            editorConfig = editorConfig,
+                            anchor = it,
+                            baseline = event.position,
+                            shiftOffset = event.length,
+                            currentInsertionStyles = insertionStyles,
                         )
                     }
-                    .filter { anchor -> anchor.isValid(textFieldValue.text.length) }
-                )
+                    .filter { it.isValid(newTextFieldValue.text.length) }
+                shiftedAnchors + insertedAnchors
             }
+
+            is TextFieldChangeEvent.Delete -> {
+                uiState.value.styleAnchors
+                    .map {
+                        shiftAnchorLeft(
+                            anchor = it,
+                            baseline = event.position,
+                            shiftOffset = event.length,
+                        )
+                    }
+                    .filter { it.isValid(newTextFieldValue.text.length) }
+            }
+
+            is TextFieldChangeEvent.Replace -> {
+                uiState.value.styleAnchors
+                    .map {
+                        // リプレイス前のテキスト削除によるアンカーの左シフト
+                        shiftAnchorLeft(
+                            anchor = it,
+                            baseline = event.position,
+                            shiftOffset = event.deletedText.length,
+                        )
+                    }
+                    .filter { it.isValid(newTextFieldValue.text.length) }
+                    .map {
+                        shiftAnchorRight(
+                            anchor = it,
+                            baseline = event.position,
+                            shiftOffset = event.insertedText.length,
+                            currentInsertionStyles = insertionStyles,
+                        )
+                    }
+                    .filter { it.isValid(newTextFieldValue.text.length) }
+            }
+
+            is TextFieldChangeEvent.NoChange -> return
+
+            else -> uiState.value.styleAnchors
         }
-        // update textFieldValue
-        mutableUiState.update { it.copy(content = textFieldValue) }
-        recalculateStyleAtCursor()
+
+        // カーソル位置での適用スタイルの計算
+        val cursorPos = newTextFieldValue.selection.start
+        val appliedAnchors = newAnchors.filter { it.start < cursorPos && cursorPos <= it.end }
+        val baseStyle =
+            appliedAnchors.find { it.style is BaseDocumentTextStyle }?.style as? BaseDocumentTextStyle
+        val newEditorConfig = uiState.value.editorConfig.copy(
+            baseStyle = baseStyle ?: uiState.value.editorConfig.baseStyle,
+            isBold = appliedAnchors.any { it.style is OverrideDocumentTextStyle.Bold },
+            isItalic = appliedAnchors.any { it.style is OverrideDocumentTextStyle.Italic },
+        )
+
+        mutableUiState.update {
+            it.copy(
+                content = newTextFieldValue.copy(
+                    annotatedString = newTextFieldValue.annotatedString.applyStyles(newAnchors)
+                ),
+                styleAnchors = newAnchors,
+                editorConfig = newEditorConfig,
+            )
+        }
     }
 
     private fun generateAnchorsToInsert(
         editorConfig: EditorConfig,
         insertPos: Int,
+        length: Int,
     ): List<StyleAnchor> {
         val anchorsToInsert = mutableListOf<StyleAnchor>()
         if (editorConfig.isBold) {
             anchorsToInsert.add(
                 StyleAnchor(
                     start = insertPos,
-                    end = insertPos,
+                    end = insertPos + length,
                     style = OverrideDocumentTextStyle.Bold(true),
                 )
             )
@@ -105,7 +172,7 @@ class EditorViewModel(
             anchorsToInsert.add(
                 StyleAnchor(
                     start = insertPos,
-                    end = insertPos,
+                    end = insertPos + length,
                     style = OverrideDocumentTextStyle.Italic(true),
                 )
             )
@@ -113,13 +180,28 @@ class EditorViewModel(
         return anchorsToInsert
     }
 
+    private fun splitAnchorsIfNeeded(
+        anchor: StyleAnchor,
+        baseline: Int,
+        currentInsertionStyles: List<AbstractDocumentTextStyle>,
+    ): List<StyleAnchor> {
+        val shouldSplit = anchor.style !in currentInsertionStyles &&
+                baseline > anchor.start && baseline < anchor.end
+        if (!shouldSplit) return listOf(anchor)
+
+        return listOf(
+            anchor.copy(start = anchor.start, end = baseline),
+            anchor.copy(start = baseline, end = anchor.end),
+        )
+    }
+
     private fun shiftAnchorLeft(
         anchor: StyleAnchor,
-        insertPos: Int,
+        baseline: Int,
         shiftOffset: Int,
     ): StyleAnchor {
-        val shouldShiftStart = anchor.start >= insertPos
-        val shouldShiftEnd = anchor.end >= insertPos
+        val shouldShiftStart = anchor.start >= baseline
+        val shouldShiftEnd = anchor.end >= baseline
         val newStart = when (shouldShiftStart) {
             true -> anchor.start - shiftOffset
             false -> anchor.start
@@ -131,19 +213,19 @@ class EditorViewModel(
         return anchor.copy(start = newStart, end = newEnd)
     }
 
+    // 既存のアンカーを右へシフトする
     private fun shiftAnchorRight(
         anchor: StyleAnchor,
-        insertPos: Int,
+        baseline: Int,
         shiftOffset: Int,
-        editorConfig: EditorConfig,
+        currentInsertionStyles: List<AbstractDocumentTextStyle>,
     ): StyleAnchor {
-        val shouldShiftStart = anchor.start > insertPos
-        val shouldShiftEnd = anchor.end >= insertPos &&
-                when (anchor.style) {
-                    is OverrideDocumentTextStyle.Bold -> editorConfig.isBold
-                    is OverrideDocumentTextStyle.Italic -> editorConfig.isItalic
-                    else -> true
-                }
+        // カーソル位置より左側のstartはシフトしない
+        val shouldShiftStart = anchor.start >= baseline
+        // カーソル位置より左側のendはシフトしない
+        val shouldShiftEnd =
+            anchor.end > baseline || (anchor.end == baseline && anchor.style in currentInsertionStyles)
+
         val newStart = when (shouldShiftStart) {
             true -> anchor.start + shiftOffset
             false -> anchor.start
@@ -152,27 +234,11 @@ class EditorViewModel(
             true -> anchor.end + shiftOffset
             false -> anchor.end
         }
+
         return anchor.copy(
             start = newStart,
             end = newEnd
         )
-    }
-
-    private fun recalculateStyleAtCursor() {
-        val styleAnchors = uiState.value.styleAnchors
-        val cursorPos = uiState.value.content.selection.start
-        val appliedAnchors = styleAnchors.filter { it.start <= cursorPos && cursorPos <= it.end }
-        val baseStyle =
-            appliedAnchors.find { it.style is BaseDocumentTextStyle }?.style as? BaseDocumentTextStyle
-        mutableUiState.update {
-            it.copy(
-                editorConfig = it.editorConfig.copy(
-                    baseStyle = baseStyle ?: it.editorConfig.baseStyle,
-                    isBold = appliedAnchors.any { it.style is OverrideDocumentTextStyle.Bold },
-                    isItalic = appliedAnchors.any { it.style is OverrideDocumentTextStyle.Italic },
-                )
-            )
-        }
     }
 
     fun toggleBold() {
