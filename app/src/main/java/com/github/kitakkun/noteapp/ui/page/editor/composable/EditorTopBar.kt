@@ -26,7 +26,7 @@ fun EditorTopBar(
             BasicTextField(
                 value = title,
                 onValueChange = onTitleChange,
-                textStyle = MaterialTheme.typography.titleLarge,
+                textStyle = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.onSurface),
             )
         },
         navigationIcon = {
