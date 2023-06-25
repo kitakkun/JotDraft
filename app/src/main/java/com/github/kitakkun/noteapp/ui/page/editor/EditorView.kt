@@ -9,7 +9,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.kitakkun.noteapp.ui.page.editor.composable.EditorTopBar
@@ -18,6 +20,7 @@ import com.github.kitakkun.noteapp.ui.page.editor.dialog.colorpicker.ColorPicker
 import com.github.kitakkun.noteapp.ui.page.editor.dialog.colorselect.SelectColorDialog
 import com.github.kitakkun.noteapp.ui.page.editor.dialog.selectbasedocument.SelectBaseDocumentTextStyleDialog
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.BaseDocumentTextStyle
+import com.github.kitakkun.noteapp.ui.page.editor.ext.applyStyles
 import com.github.kitakkun.noteapp.ui.preview.PreviewContainer
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -84,6 +87,12 @@ fun EditorView(
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp)
                     .weight(1f),
+                visualTransformation = {
+                    TransformedText(
+                        text = it.applyStyles(styleAnchors = uiState.styleAnchors),
+                        offsetMapping = OffsetMapping.Identity,
+                    )
+                }
             )
             TextStyleControlRow(
                 config = uiState.editorConfig,

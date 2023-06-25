@@ -13,7 +13,6 @@ import com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor.StyleAnchor
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.AbstractDocumentTextStyle
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.BaseDocumentTextStyle
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.OverrideDocumentTextStyle
-import com.github.kitakkun.noteapp.ui.page.editor.ext.applyStyles
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -128,8 +127,6 @@ class EditorViewModel(
                     .filter { it.isValid(newTextFieldValue.text.length) }
             }
 
-            is TextFieldChangeEvent.NoChange -> return
-
             else -> uiState.value.styleAnchors
         }
 
@@ -148,9 +145,7 @@ class EditorViewModel(
 
         mutableUiState.update {
             it.copy(
-                content = newTextFieldValue.copy(
-                    annotatedString = newTextFieldValue.annotatedString.applyStyles(newAnchors)
-                ),
+                content = newTextFieldValue,
                 styleAnchors = newAnchors,
                 editorConfig = newEditorConfig,
             )
