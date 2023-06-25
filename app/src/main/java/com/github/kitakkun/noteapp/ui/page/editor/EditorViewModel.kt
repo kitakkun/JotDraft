@@ -9,6 +9,7 @@ import androidx.navigation.NavController
 import com.github.kitakkun.noteapp.data.DocumentRepository
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.EditorConfig
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.TextFieldChangeEvent
+import com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor.BaseStyleAnchor
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor.OverrideStyleAnchor
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.BaseStyle
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.OverrideStyle
@@ -129,23 +130,11 @@ class EditorViewModel(
             else -> uiState.value.overrideStyleAnchors
         }
 
-        // カーソル位置での適用スタイルの計算
-        val cursorPos = newTextFieldValue.selection.start
-        val baseStyle = uiState.value.baseStyleAnchors.find { it ->
-            val text = newTextFieldValue.text
-            val textBeforeCursor = text.substring(0, cursorPos)
-            val lineCount = textBeforeCursor.count { it == '\n' }
-            lineCount == it.line
-        }?.style
-        val activeOverrideAnchors =
-            newAnchors.filter { it.start < cursorPos && cursorPos <= it.end }
-        val newEditorConfig = oldEditorConfig.copy(
-            baseStyle = baseStyle ?: oldEditorConfig.baseStyle,
-            isBold = activeOverrideAnchors.any { it.style is OverrideStyle.Bold },
-            isItalic = activeOverrideAnchors.any { it.style is OverrideStyle.Italic },
-            color = activeOverrideAnchors.find { it.style is OverrideStyle.Color }
-                ?.style?.spanStyle?.color
-                ?: oldEditorConfig.color
+        val newEditorConfig = recalculateEditorConfig(
+            editorConfig = oldEditorConfig,
+            newTextFieldValue = newTextFieldValue,
+            overrideAnchors = newAnchors,
+            baseAnchors = uiState.value.baseStyleAnchors,
         )
 
         mutableUiState.update {
@@ -155,6 +144,31 @@ class EditorViewModel(
                 editorConfig = newEditorConfig,
             )
         }
+    }
+
+    private fun recalculateEditorConfig(
+        editorConfig: EditorConfig,
+        newTextFieldValue: TextFieldValue,
+        overrideAnchors: List<OverrideStyleAnchor>,
+        baseAnchors: List<BaseStyleAnchor>,
+    ): EditorConfig {
+        val cursorPos = newTextFieldValue.selection.start
+        val baseStyle = baseAnchors.find { it ->
+            val text = newTextFieldValue.text
+            val textBeforeCursor = text.substring(0, cursorPos)
+            val lineCount = textBeforeCursor.count { it == '\n' }
+            lineCount == it.line
+        }?.style
+        val activeOverrideAnchors =
+            overrideAnchors.filter { it.start < cursorPos && cursorPos <= it.end }
+        return editorConfig.copy(
+            baseStyle = baseStyle ?: editorConfig.baseStyle,
+            isBold = activeOverrideAnchors.any { it.style is OverrideStyle.Bold },
+            isItalic = activeOverrideAnchors.any { it.style is OverrideStyle.Italic },
+            color = activeOverrideAnchors.find { it.style is OverrideStyle.Color }
+                ?.style?.spanStyle?.color
+                ?: editorConfig.color
+        )
     }
 
     private fun generateAnchorsToInsert(
