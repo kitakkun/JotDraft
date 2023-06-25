@@ -27,8 +27,4 @@ data class EditorUiState(
         Color.Red, Color.Green, Color.Blue,
         Color.Yellow, Color.Magenta, Color.Cyan,
     ),
-
-    // cursor あとでViewModelStateに移動したい
-    val cursorStart: Int = 0,
-    val cursorEnd: Int = 0,
 )
