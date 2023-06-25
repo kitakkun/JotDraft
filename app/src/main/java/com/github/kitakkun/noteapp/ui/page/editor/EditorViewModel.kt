@@ -59,76 +59,13 @@ class EditorViewModel(
             OverrideStyle.Italic(uiState.value.editorConfig.isItalic),
         )
 
-        val newAnchors = when (event) {
-            is TextFieldChangeEvent.Insert -> {
-                // insert new anchors which should be inserted
-                val insertedAnchors = generateAnchorsToInsert(
-                    editorConfig = oldEditorConfig,
-                    insertPos = event.position,
-                    length = event.length,
-                )
-                val shiftedAnchors = uiState.value.overrideStyleAnchors
-                    .flatMap {
-                        // 違うスタイルのものを現在のカーソル位置に挿入する場合，
-                        // 挿入点を堺に適切にスタイルアンカーを分割する必要がある
-                        val splitted = splitAnchorsIfNeeded(
-                            anchor = it,
-                            baseline = event.position,
-                            currentInsertionStyles = insertionStyles,
-                        )
-                        if (splitted.size == 2) {
-                            Log.d(TAG, "split anchor: $it -> $splitted")
-                        }
-                        splitted
-                    }
-                    .map {
-                        shiftAnchorRight(
-                            anchor = it,
-                            baseline = event.position,
-                            shiftOffset = event.length,
-                            currentInsertionStyles = insertionStyles,
-                        )
-                    }
-                    .filter { it.isValid(newTextFieldValue.text.length) }
-                shiftedAnchors + insertedAnchors
-            }
-
-            is TextFieldChangeEvent.Delete -> {
-                uiState.value.overrideStyleAnchors
-                    .map {
-                        shiftAnchorLeft(
-                            anchor = it,
-                            baseline = event.position,
-                            shiftOffset = event.length,
-                        )
-                    }
-                    .filter { it.isValid(newTextFieldValue.text.length) }
-            }
-
-            is TextFieldChangeEvent.Replace -> {
-                uiState.value.overrideStyleAnchors
-                    .map {
-                        // リプレイス前のテキスト削除によるアンカーの左シフト
-                        shiftAnchorLeft(
-                            anchor = it,
-                            baseline = event.position,
-                            shiftOffset = event.deletedText.length,
-                        )
-                    }
-                    .filter { it.isValid(newTextFieldValue.text.length) }
-                    .map {
-                        shiftAnchorRight(
-                            anchor = it,
-                            baseline = event.position,
-                            shiftOffset = event.insertedText.length,
-                            currentInsertionStyles = insertionStyles,
-                        )
-                    }
-                    .filter { it.isValid(newTextFieldValue.text.length) }
-            }
-
-            else -> uiState.value.overrideStyleAnchors
-        }
+        val newOverrideAnchors = updateOverrideAnchors(
+            oldEditorConfig = oldEditorConfig,
+            newTextFieldValue = newTextFieldValue,
+            event = event,
+            insertionStyles = insertionStyles,
+            oldOverrideAnchors = uiState.value.overrideStyleAnchors,
+        )
 
         val cursorPos = newTextFieldValue.selection.start
         val linePos = newTextFieldValue.text.getLinesAtCursor(cursorPos)
@@ -136,17 +73,94 @@ class EditorViewModel(
             editorConfig = oldEditorConfig,
             cursorPos = cursorPos,
             linePos = linePos,
-            overrideAnchors = newAnchors,
+            overrideAnchors = newOverrideAnchors,
             baseAnchors = uiState.value.baseStyleAnchors,
         )
 
         mutableUiState.update {
             it.copy(
                 content = newTextFieldValue,
-                overrideStyleAnchors = newAnchors,
+                overrideStyleAnchors = newOverrideAnchors,
                 editorConfig = newEditorConfig,
             )
         }
+    }
+
+    private fun updateOverrideAnchors(
+        oldEditorConfig: EditorConfig,
+        newTextFieldValue: TextFieldValue,
+        event: TextFieldChangeEvent,
+        insertionStyles: List<OverrideStyle>,
+        oldOverrideAnchors: List<OverrideStyleAnchor>,
+    ) = when (event) {
+        is TextFieldChangeEvent.Insert -> {
+            // insert new anchors which should be inserted
+            val insertedAnchors = generateAnchorsToInsert(
+                editorConfig = oldEditorConfig,
+                insertPos = event.position,
+                length = event.length,
+            )
+            val shiftedAnchors = oldOverrideAnchors
+                .flatMap {
+                    // 違うスタイルのものを現在のカーソル位置に挿入する場合，
+                    // 挿入点を堺に適切にスタイルアンカーを分割する必要がある
+                    val splitted = splitAnchorsIfNeeded(
+                        anchor = it,
+                        baseline = event.position,
+                        currentInsertionStyles = insertionStyles,
+                    )
+                    if (splitted.size == 2) {
+                        Log.d(TAG, "split anchor: $it -> $splitted")
+                    }
+                    splitted
+                }
+                .map {
+                    shiftAnchorRight(
+                        anchor = it,
+                        baseline = event.position,
+                        shiftOffset = event.length,
+                        currentInsertionStyles = insertionStyles,
+                    )
+                }
+                .filter { it.isValid(newTextFieldValue.text.length) }
+            shiftedAnchors + insertedAnchors
+        }
+
+        is TextFieldChangeEvent.Delete -> {
+            oldOverrideAnchors
+                .map {
+                    shiftAnchorLeft(
+                        anchor = it,
+                        baseline = event.position,
+                        shiftOffset = event.length,
+                    )
+                }
+                .filter { it.isValid(newTextFieldValue.text.length) }
+        }
+
+        is TextFieldChangeEvent.Replace -> {
+            oldOverrideAnchors
+                .map {
+                    // リプレイス前のテキスト削除によるアンカーの左シフト
+                    shiftAnchorLeft(
+                        anchor = it,
+                        baseline = event.position,
+                        shiftOffset = event.deletedText.length,
+                    )
+                }
+                .filter { it.isValid(newTextFieldValue.text.length) }
+                .map {
+                    shiftAnchorRight(
+                        anchor = it,
+                        baseline = event.position,
+                        shiftOffset = event.insertedText.length,
+                        currentInsertionStyles = insertionStyles,
+                    )
+                }
+                .filter { it.isValid(newTextFieldValue.text.length) }
+        }
+
+        else -> oldOverrideAnchors
     }
 
     private fun recalculateEditorConfig(
