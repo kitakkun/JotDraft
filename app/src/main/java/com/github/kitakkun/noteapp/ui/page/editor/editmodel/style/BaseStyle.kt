@@ -5,11 +5,11 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 
-enum class BaseDocumentTextStyle(
+enum class BaseStyle(
     val color: Color,
     val fontSize: TextUnit,
     val letterSpacing: TextUnit,
-) : AbstractDocumentTextStyle {
+) {
     Title(
         color = Color.Black,
         fontSize = 25.sp,
@@ -26,7 +26,7 @@ enum class BaseDocumentTextStyle(
         letterSpacing = 0.5.sp,
     );
 
-    override val spanStyle = SpanStyle(
+    val spanStyle = SpanStyle(
         fontSize = fontSize,
         letterSpacing = letterSpacing
     )

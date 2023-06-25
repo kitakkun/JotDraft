@@ -14,13 +14,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.BaseDocumentTextStyle
+import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.BaseStyle
 import com.github.kitakkun.noteapp.ui.preview.PreviewContainer
 
 @Composable
-fun SelectBaseDocumentTextStyleDialog(
-    selectedStyle: BaseDocumentTextStyle,
-    onSelectStyle: (BaseDocumentTextStyle) -> Unit,
+fun SelectBaseStyleDialog(
+    selectedStyle: BaseStyle,
+    onSelectStyle: (BaseStyle) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     Dialog(onDismissRequest = onDismissRequest) {
@@ -30,7 +30,7 @@ fun SelectBaseDocumentTextStyleDialog(
                 color = MaterialTheme.colorScheme.surface,
             )
         ) {
-            items(BaseDocumentTextStyle.values()) { style ->
+            items(BaseStyle.values()) { style ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -48,9 +48,9 @@ fun SelectBaseDocumentTextStyleDialog(
 
 @Preview
 @Composable
-private fun SelectBaseDocumentTextStyleDialogPreview() = PreviewContainer {
-    SelectBaseDocumentTextStyleDialog(
-        selectedStyle = BaseDocumentTextStyle.Body,
+private fun SelectBaseStyleDialogPreview() = PreviewContainer {
+    SelectBaseStyleDialog(
+        selectedStyle = BaseStyle.Body,
         onSelectStyle = {},
         onDismissRequest = {},
     )

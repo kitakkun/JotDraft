@@ -3,7 +3,8 @@ package com.github.kitakkun.noteapp.ui.page.editor
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.EditorConfig
-import com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor.StyleAnchor
+import com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor.BaseStyleAnchor
+import com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor.OverrideStyleAnchor
 
 data class EditorUiState(
     // document raw data
@@ -14,10 +15,11 @@ data class EditorUiState(
     val editorConfig: EditorConfig = EditorConfig(),
 
     // styles
-    val styleAnchors: List<StyleAnchor> = emptyList(),
+    val baseStyleAnchors: List<BaseStyleAnchor> = emptyList(),
+    val overrideStyleAnchors: List<OverrideStyleAnchor> = emptyList(),
 
     // dialogs
-    val showSelectBaseDocumentTextStyleDialog: Boolean = false,
+    val showSelectBaseStyleDialog: Boolean = false,
     val showSelectColorDialog: Boolean = false,
     val showColorPickerDialog: Boolean = false,
 

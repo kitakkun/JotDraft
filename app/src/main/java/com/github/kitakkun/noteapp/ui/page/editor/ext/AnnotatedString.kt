@@ -2,20 +2,25 @@ package com.github.kitakkun.noteapp.ui.page.editor.ext
 
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
-import com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor.StyleAnchor
-import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.BaseDocumentTextStyle
-import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.OverrideDocumentTextStyle
+import com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor.BaseStyleAnchor
+import com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor.OverrideStyleAnchor
 
-fun AnnotatedString.applyStyles(styleAnchors: List<StyleAnchor>) = buildAnnotatedString {
+fun AnnotatedString.applyStyles(
+    baseStyleAnchors: List<BaseStyleAnchor>,
+    overrideStyleAnchors: List<OverrideStyleAnchor>,
+) = buildAnnotatedString {
     append(text = text)
-    styleAnchors.filter { it.style is BaseDocumentTextStyle }.forEach {
+    baseStyleAnchors.forEach {
+        // +1 for the line break
+        val start = text.lines().take(it.line).sumOf { line -> line.length + 1 }
+        val end = start + text.lines()[it.line].length
         addStyle(
             style = it.style.spanStyle,
-            start = it.start,
-            end = it.end
+            start = start,
+            end = end,
         )
     }
-    styleAnchors.filter { it.style is OverrideDocumentTextStyle }.forEach {
+    overrideStyleAnchors.forEach {
         addStyle(
             style = it.style.spanStyle,
             start = it.start,

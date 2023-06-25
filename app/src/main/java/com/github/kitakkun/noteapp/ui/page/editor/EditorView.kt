@@ -18,8 +18,8 @@ import com.github.kitakkun.noteapp.ui.page.editor.composable.EditorTopBar
 import com.github.kitakkun.noteapp.ui.page.editor.composable.TextStyleControlRow
 import com.github.kitakkun.noteapp.ui.page.editor.dialog.colorpicker.ColorPickerDialog
 import com.github.kitakkun.noteapp.ui.page.editor.dialog.colorselect.SelectColorDialog
-import com.github.kitakkun.noteapp.ui.page.editor.dialog.selectbasedocument.SelectBaseDocumentTextStyleDialog
-import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.BaseDocumentTextStyle
+import com.github.kitakkun.noteapp.ui.page.editor.dialog.selectbasedocument.SelectBaseStyleDialog
+import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.BaseStyle
 import com.github.kitakkun.noteapp.ui.page.editor.ext.applyStyles
 import com.github.kitakkun.noteapp.ui.preview.PreviewContainer
 
@@ -34,7 +34,7 @@ fun EditorView(
     onBaseTextFormatClick: () -> Unit,
     onNavigateUpClick: () -> Unit,
     onSaveClick: () -> Unit,
-    onBaseStyleChange: (BaseDocumentTextStyle) -> Unit,
+    onBaseStyleChange: (BaseStyle) -> Unit,
     onTextColorIconClick: () -> Unit,
     onDismissSelectBaseDocumentTextStyleDialog: () -> Unit,
     onDismissColorPickerDialog: () -> Unit,
@@ -59,9 +59,9 @@ fun EditorView(
             onAddColorClick = onColorPickerOpenRequest,
         )
     }
-    if (uiState.showSelectBaseDocumentTextStyleDialog) {
-        SelectBaseDocumentTextStyleDialog(
-            selectedStyle = BaseDocumentTextStyle.Body, // TODO: 仮のもの．あとで置き換える
+    if (uiState.showSelectBaseStyleDialog) {
+        SelectBaseStyleDialog(
+            selectedStyle = uiState.editorConfig.baseStyle,
             onSelectStyle = onBaseStyleChange,
             onDismissRequest = onDismissSelectBaseDocumentTextStyleDialog,
         )
@@ -89,7 +89,10 @@ fun EditorView(
                     .weight(1f),
                 visualTransformation = {
                     TransformedText(
-                        text = it.applyStyles(styleAnchors = uiState.styleAnchors),
+                        text = it.applyStyles(
+                            baseStyleAnchors = uiState.baseStyleAnchors,
+                            overrideStyleAnchors = uiState.overrideStyleAnchors
+                        ),
                         offsetMapping = OffsetMapping.Identity,
                     )
                 }
