@@ -130,9 +130,12 @@ class EditorViewModel(
             else -> uiState.value.overrideStyleAnchors
         }
 
+        val cursorPos = newTextFieldValue.selection.start
+        val linePos = newTextFieldValue.text.getLinesAtCursor(cursorPos)
         val newEditorConfig = recalculateEditorConfig(
             editorConfig = oldEditorConfig,
-            newTextFieldValue = newTextFieldValue,
+            cursorPos = cursorPos,
+            linePos = linePos,
             overrideAnchors = newAnchors,
             baseAnchors = uiState.value.baseStyleAnchors,
         )
@@ -148,17 +151,12 @@ class EditorViewModel(
 
     private fun recalculateEditorConfig(
         editorConfig: EditorConfig,
-        newTextFieldValue: TextFieldValue,
+        cursorPos: Int,
+        linePos: Int,
         overrideAnchors: List<OverrideStyleAnchor>,
         baseAnchors: List<BaseStyleAnchor>,
     ): EditorConfig {
-        val cursorPos = newTextFieldValue.selection.start
-        val baseStyle = baseAnchors.find { it ->
-            val text = newTextFieldValue.text
-            val textBeforeCursor = text.substring(0, cursorPos)
-            val lineCount = textBeforeCursor.count { it == '\n' }
-            lineCount == it.line
-        }?.style
+        val baseStyle = baseAnchors.find { it.line == linePos }?.style
         val activeOverrideAnchors =
             overrideAnchors.filter { it.start < cursorPos && cursorPos <= it.end }
         return editorConfig.copy(
@@ -334,5 +332,10 @@ class EditorViewModel(
 
     fun showSelectColorDialog() {
         mutableUiState.update { it.copy(showSelectColorDialog = true) }
+    }
+
+    private fun String.getLinesAtCursor(cursorPosition: Int): Int {
+        val textBeforeCursor = this.substring(0, cursorPosition)
+        return textBeforeCursor.count { it == '\n' }
     }
 }
