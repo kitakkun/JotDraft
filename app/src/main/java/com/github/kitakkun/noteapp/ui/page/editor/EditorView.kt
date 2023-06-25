@@ -50,7 +50,7 @@ fun EditorView(
     if (uiState.showSelectColorDialog) {
         SelectColorDialog(
             availableColors = uiState.availableColors,
-            selectedColor = uiState.currentColor,
+            selectedColor = uiState.editorConfig.color,
             onDismiss = onDismissSelectColorDialog,
             onColorSelected = onColorSelected,
             onAddColorClick = onColorPickerOpenRequest,
@@ -87,7 +87,7 @@ fun EditorView(
             )
             TextStyleControlRow(
                 config = uiState.editorConfig,
-                color = uiState.currentColor,
+                color = uiState.editorConfig.color,
                 onBoldChange = onBoldChange,
                 onItalicChange = onItalicChange,
                 onBaseTextFormatClick = onBaseTextFormatClick,

@@ -48,6 +48,8 @@ class EditorViewModel(
     fun updateContent(newTextFieldValue: TextFieldValue) {
         // テキストの削除や追加に応じて，適切にスタイルアンカーを更新し，最後にスタイルを適用したTextFieldValueをUIStateに反映する
         val oldTextFieldValue = uiState.value.content
+        val oldEditorConfig = uiState.value.editorConfig
+
         val event = TextFieldChangeEvent.fromTextFieldValueChange(
             old = oldTextFieldValue,
             new = newTextFieldValue,
@@ -62,7 +64,7 @@ class EditorViewModel(
             is TextFieldChangeEvent.Insert -> {
                 // insert new anchors which should be inserted
                 val insertedAnchors = generateAnchorsToInsert(
-                    editorConfig = uiState.value.editorConfig,
+                    editorConfig = oldEditorConfig,
                     insertPos = event.position,
                     length = event.length,
                 )
@@ -136,10 +138,12 @@ class EditorViewModel(
         val appliedAnchors = newAnchors.filter { it.start < cursorPos && cursorPos <= it.end }
         val baseStyle =
             appliedAnchors.find { it.style is BaseDocumentTextStyle }?.style as? BaseDocumentTextStyle
-        val newEditorConfig = uiState.value.editorConfig.copy(
-            baseStyle = baseStyle ?: uiState.value.editorConfig.baseStyle,
+        val newEditorConfig = oldEditorConfig.copy(
+            baseStyle = baseStyle ?: oldEditorConfig.baseStyle,
             isBold = appliedAnchors.any { it.style is OverrideDocumentTextStyle.Bold },
             isItalic = appliedAnchors.any { it.style is OverrideDocumentTextStyle.Italic },
+            color = appliedAnchors.find { it.style is OverrideDocumentTextStyle.Color }?.style?.spanStyle?.color
+                ?: oldEditorConfig.color
         )
 
         mutableUiState.update {
@@ -174,6 +178,15 @@ class EditorViewModel(
                     start = insertPos,
                     end = insertPos + length,
                     style = OverrideDocumentTextStyle.Italic(true),
+                )
+            )
+        }
+        if (editorConfig.color != Color.Unspecified) {
+            anchorsToInsert.add(
+                StyleAnchor(
+                    start = insertPos,
+                    end = insertPos + length,
+                    style = OverrideDocumentTextStyle.Color(editorConfig.color),
                 )
             )
         }
@@ -302,7 +315,7 @@ class EditorViewModel(
     }
 
     fun updateCurrentColor(color: Color) {
-        mutableUiState.update { it.copy(currentColor = color) }
+        mutableUiState.update { it.copy(editorConfig = it.editorConfig.copy(color = color)) }
     }
 
     fun showSelectColorDialog() {
