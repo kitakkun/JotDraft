@@ -1,6 +1,5 @@
 package com.github.kitakkun.noteapp.ui.page.editor
 
-import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
@@ -102,85 +101,45 @@ class EditorViewModel(
             )
             val shiftedAnchors = oldOverrideAnchors
                 .flatMap {
-                    // 違うスタイルのものを現在のカーソル位置に挿入する場合，
-                    // 挿入点を堺に適切にスタイルアンカーを分割する必要がある
-                    val splitted = splitAnchorsIfNeeded(
-                        anchor = it,
-                        baseline = event.position,
-                        currentInsertionStyles = insertionStyles,
-                    )
-                    if (splitted.size == 2) {
-                        Log.d(TAG, "split anchor: $it -> $splitted")
-                    }
-                    splitted
+                    val shouldSplit = it.style !in insertionStyles &&
+                            event.position in it.start..it.end
+                    if (shouldSplit) it.split(at = event.position)
+                    else listOf(it)
                 }
-                .map {
-                    shiftAnchorRight(
-                        anchor = it,
-                        baseline = event.position,
-                        shiftOffset = event.length,
-                        currentInsertionStyles = insertionStyles,
-                    )
-                }
+                .mapWithRightShift(
+                    cursorPos = event.position,
+                    shiftOffset = event.length,
+                    currentInsertionStyles = insertionStyles,
+                )
                 .filter { it.isValid(newTextFieldValue.text.length) }
             shiftedAnchors + insertedAnchors
         }
 
         is TextFieldChangeEvent.Delete -> {
             oldOverrideAnchors
-                .map {
-                    shiftAnchorLeft(
-                        anchor = it,
-                        baseline = event.position,
-                        shiftOffset = event.length,
-                    )
-                }
+                .mapWithLeftShift(
+                    cursorPos = event.position,
+                    shiftOffset = event.length,
+                )
                 .filter { it.isValid(newTextFieldValue.text.length) }
         }
 
         is TextFieldChangeEvent.Replace -> {
             oldOverrideAnchors
-                .map {
-                    // リプレイス前のテキスト削除によるアンカーの左シフト
-                    shiftAnchorLeft(
-                        anchor = it,
-                        baseline = event.position,
-                        shiftOffset = event.deletedText.length,
-                    )
-                }
+                .mapWithLeftShift(
+                    cursorPos = event.position,
+                    shiftOffset = event.deletedText.length,
+                )
                 .filter { it.isValid(newTextFieldValue.text.length) }
-                .map {
-                    shiftAnchorRight(
-                        anchor = it,
-                        baseline = event.position,
-                        shiftOffset = event.insertedText.length,
-                        currentInsertionStyles = insertionStyles,
-                    )
-                }
+                .mapWithRightShift(
+                    cursorPos = event.position,
+                    shiftOffset = event.insertedText.length,
+                    currentInsertionStyles = insertionStyles,
+                )
                 .filter { it.isValid(newTextFieldValue.text.length) }
         }
 
         else -> oldOverrideAnchors
-    }
-
-    private fun recalculateEditorConfig(
-        editorConfig: EditorConfig,
-        cursorPos: Int,
-        linePos: Int,
-        overrideAnchors: List<OverrideStyleAnchor>,
-        baseAnchors: List<BaseStyleAnchor>,
-    ): EditorConfig {
-        val baseStyle = baseAnchors.find { it.line == linePos }?.style
-        val activeOverrideAnchors =
-            overrideAnchors.filter { it.start < cursorPos && cursorPos <= it.end }
-        return editorConfig.copy(
-            baseStyle = baseStyle ?: editorConfig.baseStyle,
-            isBold = activeOverrideAnchors.any { it.style is OverrideStyle.Bold },
-            isItalic = activeOverrideAnchors.any { it.style is OverrideStyle.Italic },
-            color = activeOverrideAnchors.find { it.style is OverrideStyle.Color }
-                ?.style?.spanStyle?.color
-                ?: editorConfig.color
-        )
     }
 
     private fun generateAnchorsToInsert(
@@ -219,64 +178,23 @@ class EditorViewModel(
         return anchorsToInsert
     }
 
-    private fun splitAnchorsIfNeeded(
-        anchor: OverrideStyleAnchor,
-        baseline: Int,
-        currentInsertionStyles: List<OverrideStyle>,
-    ): List<OverrideStyleAnchor> {
-        val shouldSplit = anchor.style !in currentInsertionStyles &&
-                baseline > anchor.start && baseline < anchor.end
-        if (!shouldSplit) return listOf(anchor)
-
-        return listOf(
-            anchor.copy(start = anchor.start, end = baseline),
-            anchor.copy(start = baseline, end = anchor.end),
-        )
-    }
-
-    private fun shiftAnchorLeft(
-        anchor: OverrideStyleAnchor,
-        baseline: Int,
-        shiftOffset: Int,
-    ): OverrideStyleAnchor {
-        val shouldShiftStart = anchor.start >= baseline
-        val shouldShiftEnd = anchor.end >= baseline
-        val newStart = when (shouldShiftStart) {
-            true -> anchor.start - shiftOffset
-            false -> anchor.start
-        }
-        val newEnd = when (shouldShiftEnd) {
-            true -> anchor.end - shiftOffset
-            false -> anchor.end
-        }
-        return anchor.copy(start = newStart, end = newEnd)
-    }
-
-    // 既存のアンカーを右へシフトする
-    private fun shiftAnchorRight(
-        anchor: OverrideStyleAnchor,
-        baseline: Int,
-        shiftOffset: Int,
-        currentInsertionStyles: List<OverrideStyle>,
-    ): OverrideStyleAnchor {
-        // カーソル位置より左側のstartはシフトしない
-        val shouldShiftStart = anchor.start >= baseline
-        // カーソル位置より左側のendはシフトしない
-        val shouldShiftEnd =
-            anchor.end > baseline || (anchor.end == baseline && anchor.style in currentInsertionStyles)
-
-        val newStart = when (shouldShiftStart) {
-            true -> anchor.start + shiftOffset
-            false -> anchor.start
-        }
-        val newEnd = when (shouldShiftEnd) {
-            true -> anchor.end + shiftOffset
-            false -> anchor.end
-        }
-
-        return anchor.copy(
-            start = newStart,
-            end = newEnd
+    private fun recalculateEditorConfig(
+        editorConfig: EditorConfig,
+        cursorPos: Int,
+        linePos: Int,
+        overrideAnchors: List<OverrideStyleAnchor>,
+        baseAnchors: List<BaseStyleAnchor>,
+    ): EditorConfig {
+        val baseStyle = baseAnchors.find { it.line == linePos }?.style
+        val activeOverrideAnchors =
+            overrideAnchors.filter { it.start < cursorPos && cursorPos <= it.end }
+        return editorConfig.copy(
+            baseStyle = baseStyle ?: editorConfig.baseStyle,
+            isBold = activeOverrideAnchors.any { it.style is OverrideStyle.Bold },
+            isItalic = activeOverrideAnchors.any { it.style is OverrideStyle.Italic },
+            color = activeOverrideAnchors.find { it.style is OverrideStyle.Color }
+                ?.style?.spanStyle?.color
+                ?: editorConfig.color
         )
     }
 
