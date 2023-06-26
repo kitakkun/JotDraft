@@ -1,6 +1,5 @@
 package com.github.kitakkun.noteapp.ui.page.editor
 
-import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
@@ -302,7 +301,6 @@ class EditorViewModel(
                 style = baseStyle,
             )
         }
-        Log.d(TAG, "insertAnchors: $insertAnchors")
         mutableUiState.update {
             it.copy(
                 editorConfig = it.editorConfig.copy(baseStyle = baseStyle),

@@ -1,6 +1,5 @@
 package com.github.kitakkun.noteapp.ui.page.editor.ext
 
-import android.util.Log
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor.BaseStyleAnchor
@@ -28,7 +27,6 @@ fun AnnotatedString.applyStyles(
         } else {
             start + text.lines()[it.line].length + 1
         }
-        Log.d("applyStyles", "start: $start, end: $end")
         addStyle(
             style = it.style.spanStyle,
             start = start,
