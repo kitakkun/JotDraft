@@ -1,7 +1,19 @@
 package com.github.kitakkun.noteapp.ui.page.editor.ext
 
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor.OverrideStyleAnchor
-import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.OverrideStyle
+
+/**
+ * split anchor into two anchors at the given offset
+ */
+fun List<OverrideStyleAnchor>.splitAt(offset: Int) = flatMap { anchor ->
+    val anchorRange = anchor.start until anchor.end
+    val shouldSplit = offset in anchorRange
+    if (shouldSplit) {
+        anchor.split(at = offset)
+    } else {
+        listOf(anchor)
+    }
+}
 
 fun OverrideStyleAnchor.split(at: Int) = listOf(
     copy(start = start, end = at),
@@ -20,15 +32,13 @@ fun List<OverrideStyleAnchor>.mapWithLeftShift(
 }
 
 fun List<OverrideStyleAnchor>.mapWithRightShift(
-    cursorPos: Int,
+    baseOffset: Int,
     shiftOffset: Int,
-    currentInsertionStyles: List<OverrideStyle>,
-) = map {
+) = map { anchor ->
     shiftAnchorRight(
-        anchor = it,
-        baseline = cursorPos,
+        anchor = anchor,
+        baseOffset = baseOffset,
         shiftOffset = shiftOffset,
-        currentInsertionStyles = currentInsertionStyles,
     )
 }
 
@@ -50,30 +60,15 @@ private fun shiftAnchorLeft(
     return anchor.copy(start = newStart, end = newEnd)
 }
 
-// 既存のアンカーを右へシフトする
 private fun shiftAnchorRight(
     anchor: OverrideStyleAnchor,
-    baseline: Int,
+    baseOffset: Int,
     shiftOffset: Int,
-    currentInsertionStyles: List<OverrideStyle>,
-): OverrideStyleAnchor {
-    // カーソル位置より左側のstartはシフトしない
-    val shouldShiftStart = anchor.start >= baseline
-    // カーソル位置より左側のendはシフトしない
-    val shouldShiftEnd =
-        anchor.end > baseline || (anchor.end == baseline && anchor.style in currentInsertionStyles)
-
-    val newStart = when (shouldShiftStart) {
-        true -> anchor.start + shiftOffset
-        false -> anchor.start
-    }
-    val newEnd = when (shouldShiftEnd) {
-        true -> anchor.end + shiftOffset
-        false -> anchor.end
-    }
-
-    return anchor.copy(
-        start = newStart,
-        end = newEnd
+) = when (anchor.start >= baseOffset) {
+    true -> anchor.copy(
+        start = anchor.start + shiftOffset,
+        end = anchor.end + shiftOffset,
     )
+
+    false -> anchor
 }

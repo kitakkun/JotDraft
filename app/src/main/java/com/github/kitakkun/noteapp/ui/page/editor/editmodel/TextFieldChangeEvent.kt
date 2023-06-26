@@ -3,10 +3,15 @@ package com.github.kitakkun.noteapp.ui.page.editor.editmodel
 import androidx.compose.ui.text.input.TextFieldValue
 
 sealed interface TextFieldChangeEvent {
+    val oldValue: TextFieldValue
+    val newValue: TextFieldValue
+
     data class Insert(
         val position: Int,
         val length: Int,
         val insertedText: String,
+        override val oldValue: TextFieldValue,
+        override val newValue: TextFieldValue,
     ) : TextFieldChangeEvent
 
     /**
@@ -17,16 +22,27 @@ sealed interface TextFieldChangeEvent {
         val position: Int,
         val length: Int,
         val deletedText: String,
+        override val oldValue: TextFieldValue,
+        override val newValue: TextFieldValue,
     ) : TextFieldChangeEvent
 
     data class Replace(
         val position: Int,
         val deletedText: String,
         val insertedText: String,
+        override val oldValue: TextFieldValue,
+        override val newValue: TextFieldValue,
     ) : TextFieldChangeEvent
 
-    object CursorMove : TextFieldChangeEvent
-    object NoChange : TextFieldChangeEvent
+    data class CursorMove(
+        override val oldValue: TextFieldValue,
+        override val newValue: TextFieldValue,
+    ) : TextFieldChangeEvent
+
+    data class NoChange(
+        override val oldValue: TextFieldValue,
+        override val newValue: TextFieldValue,
+    ) : TextFieldChangeEvent
 
     companion object {
         fun fromTextFieldValueChange(
@@ -34,8 +50,8 @@ sealed interface TextFieldChangeEvent {
             new: TextFieldValue,
         ) = when {
             old.text != new.text -> classifyTextChange(old, new)
-            old.selection != new.selection -> CursorMove
-            else -> NoChange
+            old.selection != new.selection -> CursorMove(old, new)
+            else -> NoChange(old, new)
         }
 
         private fun classifyTextChange(
@@ -52,6 +68,8 @@ sealed interface TextFieldChangeEvent {
                     startIndex = new.selection.start,
                     endIndex = new.selection.end,
                 ),
+                oldValue = old,
+                newValue = new,
             )
 
             old.text.length < new.text.length -> Insert(
@@ -61,6 +79,8 @@ sealed interface TextFieldChangeEvent {
                     startIndex = old.selection.start,
                     endIndex = new.selection.start,
                 ),
+                oldValue = old,
+                newValue = new,
             )
 
             old.text.length > new.text.length -> Delete(
@@ -70,9 +90,14 @@ sealed interface TextFieldChangeEvent {
                     startIndex = new.selection.start,
                     endIndex = old.selection.start,
                 ),
+                oldValue = old,
+                newValue = new,
             )
 
-            else -> NoChange
+            else -> NoChange(
+                oldValue = old,
+                newValue = new,
+            )
         }
     }
 }

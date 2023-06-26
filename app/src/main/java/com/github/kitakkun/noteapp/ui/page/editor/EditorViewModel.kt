@@ -16,7 +16,7 @@ import com.github.kitakkun.noteapp.ui.page.editor.ext.deleteLinesAndShiftUp
 import com.github.kitakkun.noteapp.ui.page.editor.ext.insertNewAnchorsAndShiftDown
 import com.github.kitakkun.noteapp.ui.page.editor.ext.mapWithLeftShift
 import com.github.kitakkun.noteapp.ui.page.editor.ext.mapWithRightShift
-import com.github.kitakkun.noteapp.ui.page.editor.ext.split
+import com.github.kitakkun.noteapp.ui.page.editor.ext.splitAt
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -64,17 +64,10 @@ class EditorViewModel(
             new = newTextFieldValue,
         )
 
-        val insertionStyles = listOf(
-            OverrideStyle.Bold(uiState.value.editorConfig.isBold),
-            OverrideStyle.Italic(uiState.value.editorConfig.isItalic),
-        )
-
         val newOverrideAnchors = updateOverrideAnchors(
-            oldEditorConfig = oldEditorConfig,
-            newTextFieldValue = newTextFieldValue,
             event = event,
-            insertionStyles = insertionStyles,
-            oldOverrideAnchors = uiState.value.overrideStyleAnchors,
+            anchors = uiState.value.overrideStyleAnchors,
+            editorConfig = oldEditorConfig,
         )
 
         val newBaseStyleAnchors = updateBaseStyleAnchors(
@@ -105,62 +98,54 @@ class EditorViewModel(
         }
     }
 
+    /**
+     * @param event [TextFieldValue]の変更を区別するイベント
+     * @param editorConfig 現在のエディタの設定
+     */
     private fun updateOverrideAnchors(
-        oldEditorConfig: EditorConfig,
-        newTextFieldValue: TextFieldValue,
         event: TextFieldChangeEvent,
-        insertionStyles: List<OverrideStyle>,
-        oldOverrideAnchors: List<OverrideStyleAnchor>,
+        anchors: List<OverrideStyleAnchor>,
+        editorConfig: EditorConfig,
     ) = when (event) {
         is TextFieldChangeEvent.Insert -> {
-            // insert new anchors which should be inserted
-            val insertedAnchors = generateAnchorsToInsert(
-                editorConfig = oldEditorConfig,
+            anchors
+                .splitAt(event.position)
+                .mapWithRightShift(
+                    baseOffset = event.position,
+                    shiftOffset = event.length,
+                ) + generateAnchorsToInsert(
+                editorConfig = editorConfig,
                 insertPos = event.position,
                 length = event.length,
             )
-            val shiftedAnchors = oldOverrideAnchors
-                .flatMap {
-                    val shouldSplit = it.style !in insertionStyles &&
-                            event.position in it.start..it.end
-                    if (shouldSplit) it.split(at = event.position)
-                    else listOf(it)
-                }
-                .mapWithRightShift(
-                    cursorPos = event.position,
-                    shiftOffset = event.length,
-                    currentInsertionStyles = insertionStyles,
-                )
-                .filter { it.isValid(newTextFieldValue.text.length) }
-            shiftedAnchors + insertedAnchors
         }
 
         is TextFieldChangeEvent.Delete -> {
-            oldOverrideAnchors
+            anchors
                 .mapWithLeftShift(
                     cursorPos = event.position,
                     shiftOffset = event.length,
                 )
-                .filter { it.isValid(newTextFieldValue.text.length) }
         }
 
         is TextFieldChangeEvent.Replace -> {
-            oldOverrideAnchors
+            anchors
+                // 選択部分の削除
+                .splitAt(event.oldValue.selection.start)
+                .splitAt(event.oldValue.selection.end)
+                .filterNot { it.start in event.oldValue.selection && it.end in event.oldValue.selection }
                 .mapWithLeftShift(
                     cursorPos = event.position,
                     shiftOffset = event.deletedText.length,
                 )
-                .filter { it.isValid(newTextFieldValue.text.length) }
                 .mapWithRightShift(
-                    cursorPos = event.position,
+                    baseOffset = event.position,
                     shiftOffset = event.insertedText.length,
-                    currentInsertionStyles = insertionStyles,
                 )
-                .filter { it.isValid(newTextFieldValue.text.length) }
         }
 
-        else -> oldOverrideAnchors
-    }
+        else -> anchors
+    }.filter { it.isValid(event.newValue.text.length) }
 
     private fun updateBaseStyleAnchors(
         oldAnchors: List<BaseStyleAnchor>,
