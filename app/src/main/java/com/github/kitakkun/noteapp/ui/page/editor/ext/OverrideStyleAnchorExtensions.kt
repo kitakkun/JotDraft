@@ -20,18 +20,18 @@ fun OverrideStyleAnchor.split(at: Int) = listOf(
     copy(start = at, end = end),
 )
 
-fun List<OverrideStyleAnchor>.mapWithLeftShift(
-    cursorPos: Int,
+fun List<OverrideStyleAnchor>.shiftToLeft(
+    baseOffset: Int,
     shiftOffset: Int,
 ) = map {
     shiftAnchorLeft(
         anchor = it,
-        baseline = cursorPos,
+        baseline = baseOffset,
         shiftOffset = shiftOffset
     )
 }
 
-fun List<OverrideStyleAnchor>.mapWithRightShift(
+fun List<OverrideStyleAnchor>.shiftToRight(
     baseOffset: Int,
     shiftOffset: Int,
 ) = map { anchor ->

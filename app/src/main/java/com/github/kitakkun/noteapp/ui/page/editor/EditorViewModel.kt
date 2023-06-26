@@ -14,8 +14,8 @@ import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.BaseStyle
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.OverrideStyle
 import com.github.kitakkun.noteapp.ui.page.editor.ext.deleteLinesAndShiftUp
 import com.github.kitakkun.noteapp.ui.page.editor.ext.insertNewAnchorsAndShiftDown
-import com.github.kitakkun.noteapp.ui.page.editor.ext.mapWithLeftShift
-import com.github.kitakkun.noteapp.ui.page.editor.ext.mapWithRightShift
+import com.github.kitakkun.noteapp.ui.page.editor.ext.shiftToLeft
+import com.github.kitakkun.noteapp.ui.page.editor.ext.shiftToRight
 import com.github.kitakkun.noteapp.ui.page.editor.ext.splitAt
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -110,7 +110,7 @@ class EditorViewModel(
         is TextFieldChangeEvent.Insert -> {
             anchors
                 .splitAt(event.position)
-                .mapWithRightShift(
+                .shiftToRight(
                     baseOffset = event.position,
                     shiftOffset = event.length,
                 ) + generateAnchorsToInsert(
@@ -121,11 +121,10 @@ class EditorViewModel(
         }
 
         is TextFieldChangeEvent.Delete -> {
-            anchors
-                .mapWithLeftShift(
-                    cursorPos = event.position,
-                    shiftOffset = event.length,
-                )
+            anchors.shiftToLeft(
+                baseOffset = event.position,
+                shiftOffset = event.length,
+            )
         }
 
         is TextFieldChangeEvent.Replace -> {
@@ -134,11 +133,11 @@ class EditorViewModel(
                 .splitAt(event.oldValue.selection.start)
                 .splitAt(event.oldValue.selection.end)
                 .filterNot { it.start in event.oldValue.selection && it.end in event.oldValue.selection }
-                .mapWithLeftShift(
-                    cursorPos = event.position,
+                .shiftToLeft(
+                    baseOffset = event.position,
                     shiftOffset = event.deletedText.length,
                 )
-                .mapWithRightShift(
+                .shiftToRight(
                     baseOffset = event.position,
                     shiftOffset = event.insertedText.length,
                 )
