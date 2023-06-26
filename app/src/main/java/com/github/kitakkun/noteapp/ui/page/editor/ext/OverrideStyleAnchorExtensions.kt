@@ -1,6 +1,7 @@
 package com.github.kitakkun.noteapp.ui.page.editor.ext
 
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor.OverrideStyleAnchor
+import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.OverrideStyle
 
 /**
  * split anchor into two anchors at the given offset.
@@ -83,4 +84,40 @@ private fun shiftAnchorRight(
     )
 
     false -> anchor
+}
+
+fun List<OverrideStyleAnchor>.optimize(): List<OverrideStyleAnchor> {
+    // まず、要素を始点とスタイルの種類でソートします
+    val sorted = this.sortedWith(
+        compareBy<OverrideStyleAnchor> { it.start }
+            .thenBy {
+                when (it.style) {
+                    is OverrideStyle.Bold -> 0
+                    is OverrideStyle.Italic -> 1
+                    else -> 2
+                }
+            }
+    )
+
+    // 最適化後のリストを保持するための変数を用意します
+    val optimized = mutableListOf<OverrideStyleAnchor>()
+
+    // ソートされたリストを反復処理します
+    for (anchor in sorted) {
+        // 最適化後のリストが空でないかつ、直前の要素と現在の要素が結合可能な場合
+        if (optimized.isNotEmpty() &&
+            optimized.last().style == anchor.style &&
+            optimized.last().end == anchor.start
+        ) {
+
+            // 直前の要素を新しい範囲で更新します
+            val last = optimized.removeLast()
+            optimized.add(last.copy(end = anchor.end))
+        } else {
+            // それ以外の場合は現在の要素を最適化後のリストに追加します
+            optimized.add(anchor)
+        }
+    }
+
+    return optimized
 }

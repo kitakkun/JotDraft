@@ -7,5 +7,5 @@ data class OverrideStyleAnchor(
     val end: Int,
     val style: OverrideStyle,
 ) {
-    fun isValid(textLength: Int) = start < end && start <= textLength && end <= textLength
+    fun isValid() = (start < end) && (start >= 0)
 }

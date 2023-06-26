@@ -14,6 +14,7 @@ import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.BaseStyle
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.OverrideStyle
 import com.github.kitakkun.noteapp.ui.page.editor.ext.deleteLinesAndShiftUp
 import com.github.kitakkun.noteapp.ui.page.editor.ext.insertNewAnchorsAndShiftDown
+import com.github.kitakkun.noteapp.ui.page.editor.ext.optimize
 import com.github.kitakkun.noteapp.ui.page.editor.ext.shiftToLeft
 import com.github.kitakkun.noteapp.ui.page.editor.ext.shiftToRight
 import com.github.kitakkun.noteapp.ui.page.editor.ext.splitAt
@@ -147,7 +148,7 @@ class EditorViewModel(
         }
 
         else -> anchors
-    }.filter { it.isValid(event.newValue.text.length) }
+    }.filter { it.isValid() }.optimize()
 
     private fun updateBaseStyleAnchors(
         oldAnchors: List<BaseStyleAnchor>,
