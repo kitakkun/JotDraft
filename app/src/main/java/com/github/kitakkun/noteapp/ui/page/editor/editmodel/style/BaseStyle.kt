@@ -4,27 +4,32 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 
 enum class BaseStyle(
     val color: Color,
     val fontSize: TextUnit,
     val letterSpacing: TextUnit,
+    val lineHeight: TextUnit = 1.5.em,
 ) {
     Title(
         color = Color.Black,
         fontSize = 25.sp,
         letterSpacing = 0.sp,
+        lineHeight = 1.2.em,
     ),
     Heading(
         color = Color.Black,
         fontSize = 22.sp,
         letterSpacing = 0.sp,
+        lineHeight = 1.2.em,
     ),
     Body(
         color = Color.Black,
         fontSize = 20.sp,
         letterSpacing = 0.5.sp,
+        lineHeight = 1.5.em,
     );
 
     val spanStyle = SpanStyle(
@@ -33,6 +38,6 @@ enum class BaseStyle(
     )
 
     val paragraphStyle = ParagraphStyle(
-        lineHeight = fontSize * 1.5f,
+        lineHeight = lineHeight
     )
 }
