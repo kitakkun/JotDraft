@@ -1,6 +1,7 @@
 package com.github.kitakkun.noteapp.ui.page.editor.editmodel
 
 import androidx.compose.ui.text.input.TextFieldValue
+import com.github.kitakkun.noteapp.ui.page.editor.ext.toValidOrder
 
 sealed interface TextFieldChangeEvent {
     val oldValue: TextFieldValue
@@ -57,47 +58,57 @@ sealed interface TextFieldChangeEvent {
         private fun classifyTextChange(
             old: TextFieldValue,
             new: TextFieldValue,
-        ) = when {
-            !old.selection.collapsed -> Replace(
-                position = old.selection.start,
-                deletedText = old.text.substring(
-                    startIndex = old.selection.start,
-                    endIndex = old.selection.end,
-                ),
-                insertedText = new.text.substring(
-                    startIndex = new.selection.start,
-                    endIndex = new.selection.end,
-                ),
-                oldValue = old,
-                newValue = new,
-            )
+        ): TextFieldChangeEvent {
+            val oldSelection = old.selection.toValidOrder()
+            val newSelection = new.selection.toValidOrder()
+            return when {
+                !old.selection.collapsed -> {
+                    Replace(
+                        position = oldSelection.start,
+                        deletedText = old.text.substring(
+                            startIndex = oldSelection.start,
+                            endIndex = oldSelection.end,
+                        ),
+                        insertedText = new.text.substring(
+                            startIndex = newSelection.start,
+                            endIndex = newSelection.end,
+                        ),
+                        oldValue = old,
+                        newValue = new,
+                    )
+                }
 
-            old.text.length < new.text.length -> Insert(
-                position = old.selection.start,
-                length = new.text.length - old.text.length,
-                insertedText = new.text.substring(
-                    startIndex = old.selection.start,
-                    endIndex = new.selection.start,
-                ),
-                oldValue = old,
-                newValue = new,
-            )
+                old.text.length < new.text.length -> {
+                    Insert(
+                        position = oldSelection.start,
+                        length = new.text.length - old.text.length,
+                        insertedText = new.text.substring(
+                            startIndex = oldSelection.start,
+                            endIndex = newSelection.start,
+                        ),
+                        oldValue = old,
+                        newValue = new,
+                    )
+                }
 
-            old.text.length > new.text.length -> Delete(
-                position = old.selection.start,
-                length = old.text.length - new.text.length,
-                deletedText = old.text.substring(
-                    startIndex = new.selection.start,
-                    endIndex = old.selection.start,
-                ),
-                oldValue = old,
-                newValue = new,
-            )
+                old.text.length > new.text.length -> {
+                    Delete(
+                        position = oldSelection.start,
+                        length = old.text.length - new.text.length,
+                        deletedText = old.text.substring(
+                            startIndex = newSelection.start,
+                            endIndex = oldSelection.start
+                        ),
+                        oldValue = old,
+                        newValue = new,
+                    )
+                }
 
-            else -> NoChange(
-                oldValue = old,
-                newValue = new,
-            )
+                else -> NoChange(
+                    oldValue = old,
+                    newValue = new,
+                )
+            }
         }
     }
 }
