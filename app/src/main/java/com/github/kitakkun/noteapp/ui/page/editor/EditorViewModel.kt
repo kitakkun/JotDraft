@@ -17,6 +17,7 @@ import com.github.kitakkun.noteapp.ui.page.editor.ext.insertNewAnchorsAndShiftDo
 import com.github.kitakkun.noteapp.ui.page.editor.ext.shiftToLeft
 import com.github.kitakkun.noteapp.ui.page.editor.ext.shiftToRight
 import com.github.kitakkun.noteapp.ui.page.editor.ext.splitAt
+import com.github.kitakkun.noteapp.ui.page.editor.ext.toValidOrder
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -243,8 +244,33 @@ class EditorViewModel(
     }
 
     fun toggleBold() {
+        val newBold = !uiState.value.editorConfig.isBold
+        val textFieldValue = uiState.value.content
+        val overrideAnchors = if (textFieldValue.selection.collapsed) {
+            uiState.value.overrideStyleAnchors
+        } else {
+            val selection = textFieldValue.selection.toValidOrder()
+            uiState.value.overrideStyleAnchors
+                .splitAt(selection.start)
+                .splitAt(selection.end)
+                .filterNot {
+                    (it.start >= selection.start)
+                            && (it.end <= selection.end)
+                            && (it.style is OverrideStyle.Bold)
+                } +
+                    listOf(
+                        OverrideStyleAnchor(
+                            start = selection.start,
+                            end = selection.end,
+                            style = OverrideStyle.Bold(newBold)
+                        )
+                    )
+        }
         mutableUiState.update {
-            it.copy(editorConfig = it.editorConfig.copy(isBold = !it.editorConfig.isBold))
+            it.copy(
+                editorConfig = it.editorConfig.copy(isBold = newBold),
+                overrideStyleAnchors = overrideAnchors,
+            )
         }
     }
 
