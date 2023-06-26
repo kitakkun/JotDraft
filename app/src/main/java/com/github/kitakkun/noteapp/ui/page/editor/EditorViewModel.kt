@@ -99,8 +99,10 @@ class EditorViewModel(
     }
 
     /**
-     * @param event [TextFieldValue]の変更を区別するイベント
-     * @param editorConfig 現在のエディタの設定
+     * update override style anchors
+     * @param event [TextFieldValue] change event
+     * @param anchors current override style anchors
+     * @param editorConfig active editor configuration
      */
     private fun updateOverrideAnchors(
         event: TextFieldChangeEvent,
