@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.ui.page.editor
+package com.github.kitakkun.noteapp.ui.page.editor.ext
 
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor.OverrideStyleAnchor
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.OverrideStyle

@@ -16,6 +16,7 @@ sealed interface TextFieldChangeEvent {
     data class Delete(
         val position: Int,
         val length: Int,
+        val deletedText: String,
     ) : TextFieldChangeEvent
 
     data class Replace(
@@ -65,6 +66,10 @@ sealed interface TextFieldChangeEvent {
             old.text.length > new.text.length -> Delete(
                 position = old.selection.start,
                 length = old.text.length - new.text.length,
+                deletedText = old.text.substring(
+                    startIndex = new.selection.start,
+                    endIndex = old.selection.start,
+                ),
             )
 
             else -> NoChange

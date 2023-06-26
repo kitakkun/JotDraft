@@ -1,5 +1,6 @@
 package com.github.kitakkun.noteapp.ui.page.editor
 
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
@@ -12,6 +13,11 @@ import com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor.BaseStyleAnch
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor.OverrideStyleAnchor
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.BaseStyle
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.OverrideStyle
+import com.github.kitakkun.noteapp.ui.page.editor.ext.deleteLinesAndShiftUp
+import com.github.kitakkun.noteapp.ui.page.editor.ext.insertNewAnchorsAndShiftDown
+import com.github.kitakkun.noteapp.ui.page.editor.ext.mapWithLeftShift
+import com.github.kitakkun.noteapp.ui.page.editor.ext.mapWithRightShift
+import com.github.kitakkun.noteapp.ui.page.editor.ext.split
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -72,8 +78,13 @@ class EditorViewModel(
             oldOverrideAnchors = uiState.value.overrideStyleAnchors,
         )
 
-        // TODO: いい感じにベーススタイルの拡張と削除を行う
-        val newBaseStyleAnchors = uiState.value.baseStyleAnchors
+        val newBaseStyleAnchors = updateBaseStyleAnchors(
+            oldAnchors = uiState.value.baseStyleAnchors,
+            insertCursorLine = oldTextFieldValue.getLineAtStartCursor(),
+            lineCount = newTextFieldValue.text.lines().size,
+            event = event,
+            insertionBaseStyle = oldEditorConfig.baseStyle,
+        )
 
         val cursorPos = newTextFieldValue.selection.start
         val linePos = newTextFieldValue.getLineAtStartCursor()
@@ -151,6 +162,44 @@ class EditorViewModel(
 
         else -> oldOverrideAnchors
     }
+
+    private fun updateBaseStyleAnchors(
+        oldAnchors: List<BaseStyleAnchor>,
+        insertCursorLine: Int,
+        lineCount: Int,
+        event: TextFieldChangeEvent,
+        insertionBaseStyle: BaseStyle,
+    ) = when (event) {
+        is TextFieldChangeEvent.Insert -> {
+            oldAnchors.insertNewAnchorsAndShiftDown(
+                baseStyle = insertionBaseStyle,
+                insertCursorLine = insertCursorLine,
+                insertLines = event.insertedText.count { it == '\n' }
+            )
+        }
+
+        is TextFieldChangeEvent.Delete -> {
+            oldAnchors.deleteLinesAndShiftUp(
+                deleteCursorLine = insertCursorLine,
+                deleteLines = event.deletedText.count { it == '\n' }
+            )
+        }
+
+        is TextFieldChangeEvent.Replace -> {
+            oldAnchors
+                .deleteLinesAndShiftUp(
+                    deleteCursorLine = insertCursorLine,
+                    deleteLines = event.deletedText.count { it == '\n' }
+                )
+                .insertNewAnchorsAndShiftDown(
+                    baseStyle = insertionBaseStyle,
+                    insertCursorLine = insertCursorLine,
+                    insertLines = event.insertedText.count { it == '\n' }
+                )
+        }
+
+        else -> oldAnchors
+    }.filter { it.isValid(lineCount) }.distinctBy { it.line }
 
     private fun generateAnchorsToInsert(
         editorConfig: EditorConfig,
@@ -253,6 +302,7 @@ class EditorViewModel(
                 style = baseStyle,
             )
         }
+        Log.d(TAG, "insertAnchors: $insertAnchors")
         mutableUiState.update {
             it.copy(
                 editorConfig = it.editorConfig.copy(baseStyle = baseStyle),
