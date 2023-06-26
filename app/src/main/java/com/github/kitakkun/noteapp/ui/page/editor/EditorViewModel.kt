@@ -27,7 +27,13 @@ class EditorViewModel(
         private const val TAG = "EditorViewModel"
     }
 
-    private val mutableUiState = MutableStateFlow(EditorUiState())
+    private val mutableUiState = MutableStateFlow(
+        EditorUiState(
+            baseStyleAnchors = listOf(
+                BaseStyleAnchor(0, BaseStyle.Body)
+            )
+        )
+    )
     val uiState = mutableUiState.asStateFlow()
 
     fun fetchDocumentData() = viewModelScope.launch {
@@ -66,19 +72,23 @@ class EditorViewModel(
             oldOverrideAnchors = uiState.value.overrideStyleAnchors,
         )
 
+        // TODO: いい感じにベーススタイルの拡張と削除を行う
+        val newBaseStyleAnchors = uiState.value.baseStyleAnchors
+
         val cursorPos = newTextFieldValue.selection.start
-        val linePos = newTextFieldValue.text.getLinesAtCursor(cursorPos)
+        val linePos = newTextFieldValue.getLineAtStartCursor()
         val newEditorConfig = recalculateEditorConfig(
             editorConfig = oldEditorConfig,
             cursorPos = cursorPos,
             linePos = linePos,
             overrideAnchors = newOverrideAnchors,
-            baseAnchors = uiState.value.baseStyleAnchors,
+            baseAnchors = newBaseStyleAnchors,
         )
 
         mutableUiState.update {
             it.copy(
                 content = newTextFieldValue,
+                baseStyleAnchors = newBaseStyleAnchors,
                 overrideStyleAnchors = newOverrideAnchors,
                 editorConfig = newEditorConfig,
             )
@@ -235,7 +245,20 @@ class EditorViewModel(
     }
 
     fun updateBaseStyle(baseStyle: BaseStyle) {
-        // do something later
+        val startCursorLine = uiState.value.content.getLineAtStartCursor()
+        val endCursorLine = uiState.value.content.getLineAtEndCursor()
+        val insertAnchors = (startCursorLine..endCursorLine).map {
+            BaseStyleAnchor(
+                line = it,
+                style = baseStyle,
+            )
+        }
+        mutableUiState.update {
+            it.copy(
+                editorConfig = it.editorConfig.copy(baseStyle = baseStyle),
+                baseStyleAnchors = (insertAnchors + it.baseStyleAnchors).distinctBy { it.line },
+            )
+        }
     }
 
     fun showSelectBaseDocumentTextStyleDialog() {
@@ -266,8 +289,17 @@ class EditorViewModel(
         mutableUiState.update { it.copy(showSelectColorDialog = true) }
     }
 
-    private fun String.getLinesAtCursor(cursorPosition: Int): Int {
-        val textBeforeCursor = this.substring(0, cursorPosition)
+    private fun TextFieldValue.getLineAtStartCursor(): Int {
+        val cursorPosition = this.selection.start
+        if (cursorPosition == 0) return 0
+        val textBeforeCursor = this.text.substring(0, cursorPosition)
+        return textBeforeCursor.count { it == '\n' }
+    }
+
+    private fun TextFieldValue.getLineAtEndCursor(): Int {
+        val cursorPosition = this.selection.end
+        if (cursorPosition == 0) return 0
+        val textBeforeCursor = this.text.substring(0, cursorPosition)
         return textBeforeCursor.count { it == '\n' }
     }
 }
