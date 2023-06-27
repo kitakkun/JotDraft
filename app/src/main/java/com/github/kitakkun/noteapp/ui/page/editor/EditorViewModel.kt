@@ -363,4 +363,12 @@ class EditorViewModel(
         val textBeforeCursor = this.text.substring(0, cursorPosition)
         return textBeforeCursor.count { it == '\n' }
     }
+
+    fun redo() {
+        TODO("Not yet implemented")
+    }
+
+    fun undo() {
+        TODO("Not yet implemented")
+    }
 }

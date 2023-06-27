@@ -42,6 +42,8 @@ fun EditorView(
     onAddColorFinished: (Color) -> Unit,
     onColorPickerOpenRequest: () -> Unit,
     onColorSelected: (Color) -> Unit,
+    onClickRedo: () -> Unit,
+    onClickUndo: () -> Unit,
 ) {
     if (uiState.showColorPickerDialog) {
         ColorPickerDialog(
@@ -71,9 +73,13 @@ fun EditorView(
         topBar = {
             EditorTopBar(
                 title = uiState.documentTitle,
+                undoEnabled = uiState.canUndo,
+                redoEnabled = uiState.canRedo,
                 onNavigateBeforeClick = onNavigateUpClick,
                 onSaveClick = onSaveClick,
                 onTitleChange = onTitleChange,
+                onClickRedo = onClickRedo,
+                onClickUndo = onClickUndo,
             )
         }
     ) { innerPadding ->
@@ -130,5 +136,7 @@ private fun NoteEditorViewPreview() = PreviewContainer {
         onAddColorFinished = {},
         onColorPickerOpenRequest = {},
         onTitleChange = {},
+        onClickRedo = {},
+        onClickUndo = {},
     )
 }
