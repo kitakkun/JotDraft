@@ -28,13 +28,13 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.Stack
 import java.util.UUID
 
 class EditorViewModel(
     private val documentId: String?,
     private val documentRepository: DocumentRepository,
     private val navController: NavController,
+    private val historyManager: EditHistoryManager,
 ) : ViewModel() {
     companion object {
         private const val TAG = "EditorViewModel"
@@ -50,8 +50,6 @@ class EditorViewModel(
     val uiState = mutableUiState.asStateFlow()
 
     private var contentChangeEventFlow = MutableStateFlow<TextFieldChangeEvent?>(null)
-    private val undoStack = Stack<EditHistory>()
-    private val redoStack = Stack<EditHistory>()
 
     init {
         viewModelScope.launch {
@@ -78,7 +76,7 @@ class EditorViewModel(
                 }
                 .collect {
                     // undoスタックに履歴を積んで
-                    undoStack.push(
+                    historyManager.pushUndo(
                         EditHistory(
                             content = uiState.value.content,
                             baseStyleAnchors = uiState.value.baseStyleAnchors,
@@ -86,7 +84,7 @@ class EditorViewModel(
                         )
                     )
                     // redoスタックをクリアして
-                    redoStack.clear()
+                    historyManager.clearRedo()
                     // redoとundoの可否を更新する
                     mutableUiState.update {
                         it.copy(
@@ -424,9 +422,8 @@ class EditorViewModel(
     }
 
     fun redo() {
-        if (redoStack.isEmpty()) return
-        val history = redoStack.pop()
-        undoStack.push(
+        val history = historyManager.popUndo() ?: return
+        historyManager.pushUndo(
             EditHistory(
                 content = uiState.value.content,
                 overrideStyleAnchors = uiState.value.overrideStyleAnchors,
@@ -438,16 +435,15 @@ class EditorViewModel(
                 content = history.content,
                 overrideStyleAnchors = history.overrideStyleAnchors,
                 baseStyleAnchors = history.baseStyleAnchors,
-                canRedo = redoStack.isNotEmpty(),
-                canUndo = undoStack.isNotEmpty(),
+                canRedo = historyManager.canRedo,
+                canUndo = historyManager.canUndo,
             )
         }
     }
 
     fun undo() {
-        if (undoStack.isEmpty()) return
-        val history = undoStack.pop()
-        redoStack.push(
+        val history = historyManager.popRedo() ?: return
+        historyManager.pushUndo(
             EditHistory(
                 content = uiState.value.content,
                 overrideStyleAnchors = uiState.value.overrideStyleAnchors,
@@ -459,8 +455,8 @@ class EditorViewModel(
                 content = history.content,
                 overrideStyleAnchors = history.overrideStyleAnchors,
                 baseStyleAnchors = history.baseStyleAnchors,
-                canRedo = redoStack.isNotEmpty(),
-                canUndo = undoStack.isNotEmpty(),
+                canRedo = historyManager.canRedo,
+                canUndo = historyManager.canUndo,
             )
         }
     }
