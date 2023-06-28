@@ -358,7 +358,16 @@ class EditorViewModel(
     }
 
     fun updateCurrentColor(color: Color) {
-        mutableUiState.update { it.copy(editorConfig = it.editorConfig.copy(color = color)) }
+        mutableUiState.update {
+            it.copy(
+                editorConfig = it.editorConfig.copy(color = color),
+                overrideStyleAnchors = toggleOverrideStyleOfSelection(
+                    selection = it.content.selection,
+                    overrideStyle = OverrideStyle.Color(color),
+                    overrideAnchors = it.overrideStyleAnchors,
+                ),
+            )
+        }
     }
 
     fun showSelectColorDialog() {
