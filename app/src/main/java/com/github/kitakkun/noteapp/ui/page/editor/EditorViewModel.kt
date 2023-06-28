@@ -1,6 +1,7 @@
 package com.github.kitakkun.noteapp.ui.page.editor
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -244,33 +245,39 @@ class EditorViewModel(
         )
     }
 
+    private fun toggleOverrideStyleOfSelection(
+        selection: TextRange,
+        overrideStyle: OverrideStyle,
+        overrideAnchors: List<OverrideStyleAnchor>,
+    ): List<OverrideStyleAnchor> {
+        if (selection.collapsed) return overrideAnchors
+        val orderedSelection = selection.toValidOrder()
+        return uiState.value.overrideStyleAnchors
+            .splitAt(orderedSelection.start)
+            .splitAt(orderedSelection.end)
+            .filterNot {
+                (it.start >= orderedSelection.start)
+                    && (it.end <= orderedSelection.end)
+                    && (it.style is OverrideStyle.Bold)
+            } + listOf(
+            OverrideStyleAnchor(
+                start = orderedSelection.start,
+                end = orderedSelection.end,
+                style = overrideStyle,
+            )
+        )
+    }
+
     fun toggleBold() {
-        val newBold = !uiState.value.editorConfig.isBold
-        val textFieldValue = uiState.value.content
-        val overrideAnchors = if (textFieldValue.selection.collapsed) {
-            uiState.value.overrideStyleAnchors
-        } else {
-            val selection = textFieldValue.selection.toValidOrder()
-            uiState.value.overrideStyleAnchors
-                .splitAt(selection.start)
-                .splitAt(selection.end)
-                .filterNot {
-                    (it.start >= selection.start)
-                            && (it.end <= selection.end)
-                            && (it.style is OverrideStyle.Bold)
-                } +
-                    listOf(
-                        OverrideStyleAnchor(
-                            start = selection.start,
-                            end = selection.end,
-                            style = OverrideStyle.Bold(newBold)
-                        )
-                    )
-        }
+        val toggledIsBold = !uiState.value.editorConfig.isBold
         mutableUiState.update {
             it.copy(
-                editorConfig = it.editorConfig.copy(isBold = newBold),
-                overrideStyleAnchors = overrideAnchors,
+                editorConfig = it.editorConfig.copy(isBold = toggledIsBold),
+                overrideStyleAnchors = toggleOverrideStyleOfSelection(
+                    selection = it.content.selection,
+                    overrideStyle = OverrideStyle.Bold(toggledIsBold),
+                    overrideAnchors = it.overrideStyleAnchors,
+                ),
             )
         }
     }
