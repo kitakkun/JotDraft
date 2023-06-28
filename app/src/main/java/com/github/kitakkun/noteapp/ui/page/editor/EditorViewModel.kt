@@ -258,7 +258,7 @@ class EditorViewModel(
             .filterNot {
                 (it.start >= orderedSelection.start)
                     && (it.end <= orderedSelection.end)
-                    && (it.style is OverrideStyle.Bold)
+                    && (it.style::class == overrideStyle::class)
             } + listOf(
             OverrideStyleAnchor(
                 start = orderedSelection.start,
