@@ -2,6 +2,7 @@ package com.github.kitakkun.noteapp.ui.page.editor
 
 import android.util.Log
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -105,6 +106,22 @@ class EditorViewModel(
         )
     }
 
+    fun saveDocument() = viewModelScope.launch {
+        if (documentId == null) {
+            documentRepository.saveDocument(
+                id = UUID.randomUUID().toString(),
+                title = uiState.value.documentTitle,
+                rawContent = uiState.value.content.text,
+            )
+        } else {
+            documentRepository.updateDocument(
+                id = documentId,
+                title = uiState.value.documentTitle,
+                rawContent = uiState.value.content.text,
+            )
+        }
+    }
+
     fun updateDocumentTitle(title: String) {
         mutableUiState.update { it.copy(documentTitle = title) }
     }
@@ -155,6 +172,96 @@ class EditorViewModel(
         viewModelScope.launch {
             contentChangeEventFlow.emit(event)
         }
+    }
+
+    fun toggleBold() {
+        val toggledIsBold = !uiState.value.editorConfig.isBold
+        mutableUiState.update {
+            it.copy(
+                editorConfig = it.editorConfig.copy(isBold = toggledIsBold),
+                overrideStyleAnchors = toggleOverrideStyleOfSelection(
+                    selection = it.content.selection,
+                    overrideStyle = OverrideStyle.Bold(toggledIsBold),
+                    overrideAnchors = it.overrideStyleAnchors,
+                ),
+            )
+        }
+    }
+
+    fun toggleItalic() {
+        val toggledIsItalic = !uiState.value.editorConfig.isItalic
+        mutableUiState.update {
+            it.copy(
+                editorConfig = it.editorConfig.copy(isItalic = toggledIsItalic),
+                overrideStyleAnchors = toggleOverrideStyleOfSelection(
+                    selection = it.content.selection,
+                    overrideStyle = OverrideStyle.Italic(toggledIsItalic),
+                    overrideAnchors = it.overrideStyleAnchors,
+                ),
+            )
+        }
+    }
+
+    fun updateBaseStyle(baseStyle: BaseStyle) {
+        val startCursorLine = uiState.value.content.getLineAtStartCursor()
+        val endCursorLine = uiState.value.content.getLineAtEndCursor()
+        val insertAnchors = (startCursorLine..endCursorLine).map {
+            BaseStyleAnchor(
+                line = it,
+                style = baseStyle,
+            )
+        }
+        mutableUiState.update {
+            it.copy(
+                editorConfig = it.editorConfig.copy(baseStyle = baseStyle),
+                baseStyleAnchors = (insertAnchors + it.baseStyleAnchors).distinctBy { it.line },
+            )
+        }
+    }
+
+    fun addColor(color: Color) {
+        mutableUiState.update { it.copy(availableColors = it.availableColors + color) }
+    }
+
+    fun updateCurrentColor(color: Color) {
+        mutableUiState.update {
+            it.copy(
+                editorConfig = it.editorConfig.copy(color = color),
+                overrideStyleAnchors = toggleOverrideStyleOfSelection(
+                    selection = it.content.selection,
+                    overrideStyle = OverrideStyle.Color(color),
+                    overrideAnchors = it.overrideStyleAnchors,
+                ),
+            )
+        }
+    }
+
+    fun navigateUp() {
+        navController.navigateUp()
+    }
+
+    fun showSelectColorDialog() {
+        mutableUiState.update { it.copy(showSelectColorDialog = true) }
+    }
+
+    fun dismissSelectColorDialog() {
+        mutableUiState.update { it.copy(showSelectColorDialog = false) }
+    }
+
+    fun showColorPickerDialog() {
+        mutableUiState.update { it.copy(showColorPickerDialog = true) }
+    }
+
+    fun dismissColorPickerDialog() {
+        mutableUiState.update { it.copy(showColorPickerDialog = false) }
+    }
+
+    fun showSelectBaseDocumentTextStyleDialog() {
+        mutableUiState.update { it.copy(showSelectBaseStyleDialog = true) }
+    }
+
+    fun dismissSelectBaseDocumentTextStyleDialog() {
+        mutableUiState.update { it.copy(showSelectBaseStyleDialog = false) }
     }
 
     /**
@@ -301,110 +408,27 @@ class EditorViewModel(
         )
     }
 
-    fun toggleBold() {
-        val newBold = !uiState.value.editorConfig.isBold
-        val textFieldValue = uiState.value.content
-        val overrideAnchors = if (textFieldValue.selection.collapsed) {
-            uiState.value.overrideStyleAnchors
-        } else {
-            val selection = textFieldValue.selection.toValidOrder()
-            uiState.value.overrideStyleAnchors
-                .splitAt(selection.start)
-                .splitAt(selection.end)
-                .filterNot {
-                    (it.start >= selection.start)
-                        && (it.end <= selection.end)
-                        && (it.style is OverrideStyle.Bold)
-                } +
-                listOf(
-                    OverrideStyleAnchor(
-                        start = selection.start,
-                        end = selection.end,
-                        style = OverrideStyle.Bold(newBold)
-                    )
-                )
-        }
-        mutableUiState.update {
-            it.copy(
-                editorConfig = it.editorConfig.copy(isBold = newBold),
-                overrideStyleAnchors = overrideAnchors,
+    private fun toggleOverrideStyleOfSelection(
+        selection: TextRange,
+        overrideStyle: OverrideStyle,
+        overrideAnchors: List<OverrideStyleAnchor>,
+    ): List<OverrideStyleAnchor> {
+        if (selection.collapsed) return overrideAnchors
+        val orderedSelection = selection.toValidOrder()
+        return uiState.value.overrideStyleAnchors
+            .splitAt(orderedSelection.start)
+            .splitAt(orderedSelection.end)
+            .filterNot {
+                (it.start >= orderedSelection.start)
+                    && (it.end <= orderedSelection.end)
+                    && (it.style::class == overrideStyle::class)
+            } + listOf(
+            OverrideStyleAnchor(
+                start = orderedSelection.start,
+                end = orderedSelection.end,
+                style = overrideStyle,
             )
-        }
-    }
-
-    fun toggleItalic() {
-        mutableUiState.update {
-            it.copy(editorConfig = it.editorConfig.copy(isItalic = !it.editorConfig.isItalic))
-        }
-    }
-
-    fun saveDocument() = viewModelScope.launch {
-        if (documentId == null) {
-            documentRepository.saveDocument(
-                id = UUID.randomUUID().toString(),
-                title = uiState.value.documentTitle,
-                rawContent = uiState.value.content.text,
-            )
-        } else {
-            documentRepository.updateDocument(
-                id = documentId,
-                title = uiState.value.documentTitle,
-                rawContent = uiState.value.content.text,
-            )
-        }
-    }
-
-    fun navigateUp() {
-        navController.navigateUp()
-    }
-
-    fun dismissSelectBaseDocumentTextStyleDialog() {
-        mutableUiState.update { it.copy(showSelectBaseStyleDialog = false) }
-    }
-
-    fun updateBaseStyle(baseStyle: BaseStyle) {
-        val startCursorLine = uiState.value.content.getLineAtStartCursor()
-        val endCursorLine = uiState.value.content.getLineAtEndCursor()
-        val insertAnchors = (startCursorLine..endCursorLine).map {
-            BaseStyleAnchor(
-                line = it,
-                style = baseStyle,
-            )
-        }
-        mutableUiState.update {
-            it.copy(
-                editorConfig = it.editorConfig.copy(baseStyle = baseStyle),
-                baseStyleAnchors = (insertAnchors + it.baseStyleAnchors).distinctBy { it.line },
-            )
-        }
-    }
-
-    fun showSelectBaseDocumentTextStyleDialog() {
-        mutableUiState.update { it.copy(showSelectBaseStyleDialog = true) }
-    }
-
-    fun dismissSelectColorDialog() {
-        mutableUiState.update { it.copy(showSelectColorDialog = false) }
-    }
-
-    fun dismissColorPickerDialog() {
-        mutableUiState.update { it.copy(showColorPickerDialog = false) }
-    }
-
-    fun showColorPickerDialog() {
-        mutableUiState.update { it.copy(showColorPickerDialog = true) }
-    }
-
-    fun addColor(color: Color) {
-        mutableUiState.update { it.copy(availableColors = it.availableColors + color) }
-    }
-
-    fun updateCurrentColor(color: Color) {
-        mutableUiState.update { it.copy(editorConfig = it.editorConfig.copy(color = color)) }
-    }
-
-    fun showSelectColorDialog() {
-        mutableUiState.update { it.copy(showSelectColorDialog = true) }
+        )
     }
 
     private fun TextFieldValue.getLineAtStartCursor(): Int {
