@@ -1,5 +1,6 @@
 package com.github.kitakkun.noteapp.ui.page.editor.editmodel.serializer
 
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.sp
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.OverrideStyle
 import com.google.gson.TypeAdapter
@@ -28,7 +29,7 @@ class OverrideStyleTypeAdapter : TypeAdapter<OverrideStyle>() {
 
             is OverrideStyle.Color -> {
                 out.name("type").value("color")
-                out.name("params").beginArray().value(value.color.value.toString()).endArray()
+                out.name("params").beginArray().value(value.color.toArgb().toString()).endArray()
             }
         }
         out.endObject()
@@ -57,7 +58,7 @@ class OverrideStyleTypeAdapter : TypeAdapter<OverrideStyle>() {
             "bold" -> OverrideStyle.Bold(params[0].toBoolean())
             "italic" -> OverrideStyle.Italic(params[0].toBoolean())
             "fontSize" -> OverrideStyle.FontSize(params[0].toDouble().sp)
-            "color" -> OverrideStyle.Color(androidx.compose.ui.graphics.Color(params[0].toLong()))
+            "color" -> OverrideStyle.Color(androidx.compose.ui.graphics.Color(params[0].toInt()))
             else -> throw IllegalArgumentException("Unknown type: $type")
         }
     }
