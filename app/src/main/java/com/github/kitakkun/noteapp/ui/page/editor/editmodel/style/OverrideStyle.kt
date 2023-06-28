@@ -4,7 +4,10 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
+import com.github.kitakkun.noteapp.ui.page.editor.editmodel.serializer.OverrideStyleSerializer
+import kotlinx.serialization.Serializable
 
+@Serializable(with = OverrideStyleSerializer::class)
 sealed interface OverrideStyle {
     val spanStyle: SpanStyle
 

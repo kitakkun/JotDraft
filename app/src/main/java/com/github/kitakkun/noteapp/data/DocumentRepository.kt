@@ -1,5 +1,7 @@
 package com.github.kitakkun.noteapp.data
 
+import com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor.BaseStyleAnchor
+import com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor.OverrideStyleAnchor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -10,12 +12,16 @@ class DocumentRepository(
         id: String,
         title: String,
         rawContent: String,
+        baseStyleAnchors: List<BaseStyleAnchor>,
+        overrideStyleAnchors: List<OverrideStyleAnchor>,
     ) = withContext(Dispatchers.IO) {
         documentDao.insert(
             DocumentEntity(
                 id = id,
                 title = title,
                 content = rawContent,
+                baseStyleAnchors = baseStyleAnchors,
+                overrideStyleAnchors = overrideStyleAnchors,
             )
         )
     }
@@ -24,12 +30,16 @@ class DocumentRepository(
         id: String,
         title: String,
         rawContent: String,
+        baseStyleAnchors: List<BaseStyleAnchor>,
+        overrideStyleAnchors: List<OverrideStyleAnchor>,
     ) = withContext(Dispatchers.IO) {
         documentDao.update(
             DocumentEntity(
                 id = id,
                 title = title,
                 content = rawContent,
+                baseStyleAnchors = baseStyleAnchors,
+                overrideStyleAnchors = overrideStyleAnchors,
             )
         )
     }

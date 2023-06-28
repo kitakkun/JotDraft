@@ -50,6 +50,8 @@ class EditorViewModel(
         mutableUiState.value = uiState.value.copy(
             documentTitle = document.title,
             content = TextFieldValue(document.content),
+            baseStyleAnchors = document.baseStyleAnchors,
+            overrideStyleAnchors = document.overrideStyleAnchors,
         )
     }
 
@@ -59,12 +61,16 @@ class EditorViewModel(
                 id = UUID.randomUUID().toString(),
                 title = uiState.value.documentTitle,
                 rawContent = uiState.value.content.text,
+                baseStyleAnchors = uiState.value.baseStyleAnchors,
+                overrideStyleAnchors = uiState.value.overrideStyleAnchors,
             )
         } else {
             documentRepository.updateDocument(
                 id = documentId,
                 title = uiState.value.documentTitle,
                 rawContent = uiState.value.content.text,
+                baseStyleAnchors = uiState.value.baseStyleAnchors,
+                overrideStyleAnchors = uiState.value.overrideStyleAnchors,
             )
         }
     }
