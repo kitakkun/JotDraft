@@ -283,8 +283,16 @@ class EditorViewModel(
     }
 
     fun toggleItalic() {
+        val toggledIsItalic = !uiState.value.editorConfig.isItalic
         mutableUiState.update {
-            it.copy(editorConfig = it.editorConfig.copy(isItalic = !it.editorConfig.isItalic))
+            it.copy(
+                editorConfig = it.editorConfig.copy(isItalic = toggledIsItalic),
+                overrideStyleAnchors = toggleOverrideStyleOfSelection(
+                    selection = it.content.selection,
+                    overrideStyle = OverrideStyle.Italic(toggledIsItalic),
+                    overrideAnchors = it.overrideStyleAnchors,
+                ),
+            )
         }
     }
 
