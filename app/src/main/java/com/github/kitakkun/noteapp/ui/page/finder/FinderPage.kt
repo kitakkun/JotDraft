@@ -19,5 +19,14 @@ fun FinderPage(
         uiState = uiState,
         onAddDocumentClick = viewModel::createNewDocument,
         onDocumentItemClick = viewModel::openDocument,
+        onChangeSearchWord = viewModel::updateSearchWord,
+        onClickEdit = viewModel::toggleEditMode,
+        onClickNewFolder = {},
+        onClickRemove = viewModel::openConfirmRemovalDialog,
+        onClickYesConfirmRemovalDialog = {
+            viewModel.removeDocument()
+            viewModel.closeConfirmRemovalDialog()
+        },
+        onClickCancelConfirmRemovalDialog = viewModel::closeConfirmRemovalDialog,
     )
 }

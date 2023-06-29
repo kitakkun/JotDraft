@@ -7,6 +7,7 @@ import com.github.kitakkun.noteapp.data.DocumentRepository
 import com.github.kitakkun.noteapp.ui.navigation.MainPage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class FinderViewModel(
@@ -37,5 +38,51 @@ class FinderViewModel(
 
     fun openDocument(documentId: String) {
         navController.navigate(MainPage.Editor.routeWithArgs(documentId))
+    }
+
+    fun updateSearchWord(word: String) {
+        mutableUiState.update {
+            it.copy(searchWord = word)
+        }
+    }
+
+    fun toggleEditMode() {
+        mutableUiState.update {
+            it.copy(isEditMode = !it.isEditMode)
+        }
+    }
+
+    fun openConfirmRemovalDialog(id: String) {
+        mutableUiState.update {
+            it.copy(
+                showConfirmRemovalDialog = true,
+                selectedDocumentId = id,
+            )
+        }
+    }
+
+    fun removeDocument() = viewModelScope.launch {
+        val documentId = uiState.value.selectedDocumentId ?: return@launch
+        documentRepository.deleteDocumentById(documentId)
+        mutableUiState.update {
+            it.copy(
+                documents = it.documents.map { document ->
+                    if (document.id != documentId) {
+                        document
+                    } else {
+                        document.copy(isDeleted = true)
+                    }
+                }
+            )
+        }
+    }
+
+    fun closeConfirmRemovalDialog() {
+        mutableUiState.update {
+            it.copy(
+                showConfirmRemovalDialog = false,
+                selectedDocumentId = null,
+            )
+        }
     }
 }
