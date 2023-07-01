@@ -61,7 +61,9 @@ fun FinderView(
                     SearchField(
                         searchWord = uiState.searchWord,
                         onChangeSearchWord = onChangeSearchWord,
-                        modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(end = 16.dp),
                     )
                 },
                 actions = {
