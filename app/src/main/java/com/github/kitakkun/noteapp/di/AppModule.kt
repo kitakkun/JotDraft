@@ -2,6 +2,7 @@ package com.github.kitakkun.noteapp.di
 
 import androidx.navigation.NavController
 import androidx.room.Room
+import com.github.kitakkun.noteapp.data.DOCUMENT_MIGRATION_V1_V2
 import com.github.kitakkun.noteapp.data.DocumentDatabase
 import com.github.kitakkun.noteapp.data.DocumentRepository
 import com.github.kitakkun.noteapp.ui.page.editor.EditHistoryManager
@@ -20,7 +21,7 @@ val appModule = module {
             context = androidContext(),
             klass = DocumentDatabase::class.java,
             name = "document_database",
-        ).build()
+        ).addMigrations(DOCUMENT_MIGRATION_V1_V2).build()
     }
     single { get<DocumentDatabase>().documentDao() }
     viewModel { (documentId: String?, navController: NavController) ->

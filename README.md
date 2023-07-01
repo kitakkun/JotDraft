@@ -1,4 +1,7 @@
-## 仕様
+# NoteApp
 
-BaseDocumentStyle: タイトル，見出し，本文などの属性を設定するスタイル
-OverrideDocumentStyle: BaseDocumentStyleの一部属性を上書きするためのスタイル
+A simple note app for Android. Full Jetpack Compose.
+
+## Demo
+
+https://github.com/kitakkun/NoteApp/assets/48154936/a34cdbe2-06aa-4898-a9ae-0d6f1b07d7fe

@@ -4,7 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(entities = [DocumentEntity::class], version = 1)
+@Database(entities = [DocumentEntity::class], version = 2)
 @TypeConverters(DocumentConverter::class)
 abstract class DocumentDatabase : RoomDatabase() {
     abstract fun documentDao(): DocumentDao
