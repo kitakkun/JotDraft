@@ -10,6 +10,7 @@ import com.github.kitakkun.noteapp.ui.page.editor.EditorViewModel
 import com.github.kitakkun.noteapp.ui.page.finder.FinderViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
@@ -32,11 +33,6 @@ val appModule = module {
             historyManager = get(),
         )
     }
-    viewModel { (navController: NavController) ->
-        FinderViewModel(
-            documentRepository = get(),
-            navController = navController
-        )
-    }
     factoryOf(::EditHistoryManager)
+    viewModelOf(::FinderViewModel)
 }
