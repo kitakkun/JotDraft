@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CreateNewFolder
 import androidx.compose.material.icons.filled.NoteAdd
 import androidx.compose.material.icons.filled.RemoveCircleOutline
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,7 +34,6 @@ fun FinderView(
     onClickAddDocument: () -> Unit,
     onChangeSearchWord: (String) -> Unit,
     onClickEdit: () -> Unit,
-    onClickNewFolder: () -> Unit,
     onClickRemove: (documentId: String) -> Unit,
     onClickYesConfirmRemovalDialog: () -> Unit,
     onClickCancelConfirmRemovalDialog: () -> Unit,
@@ -67,9 +65,6 @@ fun FinderView(
                     )
                 },
                 actions = {
-                    IconButton(onClick = onClickNewFolder) {
-                        Icon(imageVector = Icons.Default.CreateNewFolder, contentDescription = null)
-                    }
                     TextButton(onClick = onClickEdit) {
                         Text(text = if (!uiState.isEditMode) "Edit" else "Done")
                     }
@@ -120,7 +115,6 @@ private fun FinderViewPreview() = PreviewContainer {
         onClickDocumentItem = {},
         onChangeSearchWord = {},
         onClickEdit = {},
-        onClickNewFolder = {},
         onClickRemove = {},
         onClickCancelConfirmRemovalDialog = {},
         onClickYesConfirmRemovalDialog = {},
@@ -136,7 +130,6 @@ private fun FinderViewEditModePreview() = PreviewContainer {
         onClickDocumentItem = {},
         onChangeSearchWord = {},
         onClickEdit = {},
-        onClickNewFolder = {},
         onClickRemove = {},
         onClickCancelConfirmRemovalDialog = {},
         onClickYesConfirmRemovalDialog = {},
