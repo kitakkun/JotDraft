@@ -31,8 +31,8 @@ import com.github.kitakkun.noteapp.ui.preview.PreviewContainer
 @Composable
 fun FinderView(
     uiState: FinderUiState,
-    onDocumentItemClick: (String) -> Unit,
-    onAddDocumentClick: () -> Unit,
+    onClickDocumentItem: (String) -> Unit,
+    onClickAddDocument: () -> Unit,
     onChangeSearchWord: (String) -> Unit,
     onClickEdit: () -> Unit,
     onClickNewFolder: () -> Unit,
@@ -75,7 +75,7 @@ fun FinderView(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddDocumentClick) {
+            FloatingActionButton(onClick = onClickAddDocument) {
                 Icon(imageVector = Icons.Default.NoteAdd, contentDescription = null)
             }
         },
@@ -100,7 +100,7 @@ fun FinderView(
                     }
                     DocumentItem(
                         uiState = it,
-                        onClick = { onDocumentItemClick(it.id) },
+                        onClick = { onClickDocumentItem(it.id) },
                         onClickEnabled = !uiState.isEditMode,
                     )
                 }
@@ -114,8 +114,8 @@ fun FinderView(
 private fun FinderViewPreview() = PreviewContainer {
     FinderView(
         uiState = FinderUiState.buildPreviewData(),
-        onAddDocumentClick = {},
-        onDocumentItemClick = {},
+        onClickAddDocument = {},
+        onClickDocumentItem = {},
         onChangeSearchWord = {},
         onClickEdit = {},
         onClickNewFolder = {},
@@ -130,8 +130,8 @@ private fun FinderViewPreview() = PreviewContainer {
 private fun FinderViewEditModePreview() = PreviewContainer {
     FinderView(
         uiState = FinderUiState.buildPreviewData().copy(isEditMode = true),
-        onAddDocumentClick = {},
-        onDocumentItemClick = {},
+        onClickAddDocument = {},
+        onClickDocumentItem = {},
         onChangeSearchWord = {},
         onClickEdit = {},
         onClickNewFolder = {},

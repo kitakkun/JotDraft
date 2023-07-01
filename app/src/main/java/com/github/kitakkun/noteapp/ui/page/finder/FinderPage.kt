@@ -17,8 +17,8 @@ fun FinderPage(
 
     FinderView(
         uiState = uiState,
-        onAddDocumentClick = viewModel::createNewDocument,
-        onDocumentItemClick = viewModel::openDocument,
+        onClickAddDocument = viewModel::createNewDocument,
+        onClickDocumentItem = viewModel::openDocument,
         onChangeSearchWord = viewModel::updateSearchWord,
         onClickEdit = viewModel::toggleEditMode,
         onClickNewFolder = {},
