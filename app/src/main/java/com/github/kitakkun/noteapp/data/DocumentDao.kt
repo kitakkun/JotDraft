@@ -26,6 +26,9 @@ interface DocumentDao {
     @Delete
     fun delete(document: DocumentEntity)
 
+    @Query("DELETE FROM DocumentEntity WHERE id = :documentId")
+    fun deleteById(documentId: String?)
+
     @Query("SELECT * FROM DocumentEntity WHERE id = :documentId")
     fun getById(documentId: String?): DocumentEntity?
 }

@@ -45,8 +45,15 @@ class DocumentRepository(
     }
 
     suspend fun deleteDocument(
-        title: String,
+        document: DocumentEntity,
     ) = withContext(Dispatchers.IO) {
+        documentDao.delete(document)
+    }
+
+    suspend fun deleteDocumentById(
+        documentId: String?,
+    ) = withContext(Dispatchers.IO) {
+        documentDao.deleteById(documentId)
     }
 
     suspend fun fetchDocuments() = withContext(Dispatchers.IO) {

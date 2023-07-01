@@ -23,10 +23,11 @@ fun DocumentItem(
     uiState: DocumentItemUiState,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onClickEnabled: Boolean = true,
 ) {
     Row(
         modifier = modifier
-            .clickable {
+            .clickable(enabled = onClickEnabled) {
                 onClick()
             }
             .fillMaxWidth()
