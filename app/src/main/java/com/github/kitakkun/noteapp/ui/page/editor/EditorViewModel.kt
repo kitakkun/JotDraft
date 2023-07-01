@@ -452,7 +452,7 @@ class EditorViewModel(
     }
 
     fun redo() {
-        val history = historyManager.popUndo() ?: return
+        val history = historyManager.popRedo() ?: return
         historyManager.pushUndo(
             EditHistory(
                 content = uiState.value.content,
@@ -472,8 +472,8 @@ class EditorViewModel(
     }
 
     fun undo() {
-        val history = historyManager.popRedo() ?: return
-        historyManager.pushUndo(
+        val history = historyManager.popUndo() ?: return
+        historyManager.pushRedo(
             EditHistory(
                 content = uiState.value.content,
                 overrideStyleAnchors = uiState.value.overrideStyleAnchors,
