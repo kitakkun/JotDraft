@@ -36,10 +36,10 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)
     debugImplementation(libs.compose.ui.tooling.preview)
+    debugImplementation(libs.compose.ui.tooling)
     implementation(libs.compose.material.icons.extended)
     implementation(libs.navigation.compose)
 
     implementation(libs.koin.core)
     implementation(libs.koin.android)
-
 }
