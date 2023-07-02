@@ -1,6 +1,5 @@
 package com.github.kitakkun.noteapp.ui.page.editor
 
-import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
@@ -22,11 +21,11 @@ import com.github.kitakkun.noteapp.ui.page.editor.ext.shiftToLeft
 import com.github.kitakkun.noteapp.ui.page.editor.ext.shiftToRight
 import com.github.kitakkun.noteapp.ui.page.editor.ext.splitAt
 import com.github.kitakkun.noteapp.ui.page.editor.ext.toValidOrder
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -39,6 +38,7 @@ class EditorViewModel(
 ) : ViewModel() {
     companion object {
         private const val TAG = "EditorViewModel"
+        private const val IDLE_TIME_TO_SAVE_HISTORY = 2000L
     }
 
     private val mutableUiState = MutableStateFlow(
@@ -50,50 +50,35 @@ class EditorViewModel(
     )
     val uiState = mutableUiState.asStateFlow()
 
-    private var contentChangeEventFlow = MutableStateFlow<TextFieldChangeEvent?>(null)
+    private val lastEditTimeFlow: MutableSharedFlow<Long> = MutableSharedFlow()
+    private val saveHistoryFlow: MutableSharedFlow<EditHistory> = MutableSharedFlow()
 
     init {
         viewModelScope.launch {
-            contentChangeEventFlow.collect {
-                Log.d(TAG, "contentChangeEventFlow: $it")
-            }
-        }
-        viewModelScope.launch {
-            contentChangeEventFlow
-                .filterNotNull()
-                // テキストに編集が加わるイベントが起きて
-                .filter {
-                    it is TextFieldChangeEvent.Insert || it is TextFieldChangeEvent.Delete || it is TextFieldChangeEvent.Replace
-                }
-                // 尚且つ編集イベントが変わったタイミングで
-                .distinctUntilChanged { old, new ->
-                    old.javaClass.name == new.javaClass.name
-                        && (
-                        (new is TextFieldChangeEvent.Insert && new.insertedText.indexOf('\n') == -1) ||
-                            (new is TextFieldChangeEvent.Delete && new.deletedText.indexOf('\n') == -1) ||
-                            (new is TextFieldChangeEvent.Replace && new.deletedText.indexOf('\n') == -1) ||
-                            (new is TextFieldChangeEvent.Replace && new.insertedText.indexOf('\n') == -1)
-                        )
-                }
-                .collect {
-                    // undoスタックに履歴を積んで
-                    historyManager.pushUndo(
-                        EditHistory(
-                            content = uiState.value.content,
-                            baseStyleAnchors = uiState.value.baseStyleAnchors,
-                            overrideStyleAnchors = uiState.value.overrideStyleAnchors,
-                        )
+            lastEditTimeFlow
+                .distinctUntilChanged { old, new -> new - old < IDLE_TIME_TO_SAVE_HISTORY }
+                .map {
+                    EditHistory(
+                        content = uiState.value.content,
+                        baseStyleAnchors = uiState.value.baseStyleAnchors,
+                        overrideStyleAnchors = uiState.value.overrideStyleAnchors,
                     )
-                    // redoスタックをクリアして
-                    historyManager.clearRedo()
-                    // redoとundoの可否を更新する
-                    mutableUiState.update {
-                        it.copy(
-                            canUndo = true,
-                            canRedo = false,
-                        )
-                    }
                 }
+                .distinctUntilChanged { old, new -> old.content.text == new.content.text }
+                .collect { history ->
+                    saveHistoryFlow.emit(history)
+                }
+        }
+
+        viewModelScope.launch {
+            saveHistoryFlow.collect { history ->
+                historyManager.pushUndo(history)
+                historyManager.clearRedo()
+                mutableUiState.update {
+                    it.copy(canRedo = historyManager.canRedo, canUndo = historyManager.canUndo)
+                }
+            }
+
         }
     }
 
@@ -176,12 +161,23 @@ class EditorViewModel(
         }
 
         viewModelScope.launch {
-            contentChangeEventFlow.emit(event)
+            lastEditTimeFlow.emit(System.currentTimeMillis())
         }
     }
 
     fun toggleBold() {
         val toggledIsBold = !uiState.value.editorConfig.isBold
+        if (!uiState.value.content.selection.collapsed) {
+            viewModelScope.launch {
+                saveHistoryFlow.emit(
+                    EditHistory(
+                        content = uiState.value.content,
+                        overrideStyleAnchors = uiState.value.overrideStyleAnchors,
+                        baseStyleAnchors = uiState.value.baseStyleAnchors,
+                    )
+                )
+            }
+        }
         mutableUiState.update {
             it.copy(
                 editorConfig = it.editorConfig.copy(isBold = toggledIsBold),
@@ -196,6 +192,17 @@ class EditorViewModel(
 
     fun toggleItalic() {
         val toggledIsItalic = !uiState.value.editorConfig.isItalic
+        if (!uiState.value.content.selection.collapsed) {
+            viewModelScope.launch {
+                saveHistoryFlow.emit(
+                    EditHistory(
+                        content = uiState.value.content,
+                        overrideStyleAnchors = uiState.value.overrideStyleAnchors,
+                        baseStyleAnchors = uiState.value.baseStyleAnchors,
+                    )
+                )
+            }
+        }
         mutableUiState.update {
             it.copy(
                 editorConfig = it.editorConfig.copy(isItalic = toggledIsItalic),
@@ -230,13 +237,24 @@ class EditorViewModel(
     }
 
     fun updateCurrentColor(color: Color) {
-        mutableUiState.update {
-            it.copy(
-                editorConfig = it.editorConfig.copy(color = color),
+        if (!uiState.value.content.selection.collapsed) {
+            viewModelScope.launch {
+                saveHistoryFlow.emit(
+                    EditHistory(
+                        content = uiState.value.content,
+                        overrideStyleAnchors = uiState.value.overrideStyleAnchors,
+                        baseStyleAnchors = uiState.value.baseStyleAnchors,
+                    )
+                )
+            }
+        }
+        mutableUiState.update { uiState ->
+            uiState.copy(
+                editorConfig = uiState.editorConfig.copy(color = color),
                 overrideStyleAnchors = toggleOverrideStyleOfSelection(
-                    selection = it.content.selection,
+                    selection = uiState.content.selection,
                     overrideStyle = OverrideStyle.Color(color),
-                    overrideAnchors = it.overrideStyleAnchors,
+                    overrideAnchors = uiState.overrideStyleAnchors,
                 ),
             )
         }
@@ -421,7 +439,7 @@ class EditorViewModel(
     ): List<OverrideStyleAnchor> {
         if (selection.collapsed) return overrideAnchors
         val orderedSelection = selection.toValidOrder()
-        return uiState.value.overrideStyleAnchors
+        val newAnchors = uiState.value.overrideStyleAnchors
             .splitAt(orderedSelection.start)
             .splitAt(orderedSelection.end)
             .filterNot {
@@ -435,6 +453,7 @@ class EditorViewModel(
                 style = overrideStyle,
             )
         )
+        return newAnchors
     }
 
     private fun TextFieldValue.getLineAtStartCursor(): Int {

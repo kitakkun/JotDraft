@@ -10,6 +10,11 @@ class EditHistoryManager {
     val canUndo: Boolean get() = undoStack.isNotEmpty()
     val canRedo: Boolean get() = redoStack.isNotEmpty()
 
+    fun peekUndo(): EditHistory? {
+        if (undoStack.isEmpty()) return null
+        return undoStack.peek()
+    }
+
     fun pushUndo(editHistory: EditHistory) {
         undoStack.push(editHistory)
     }
