@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="no_documents">No Documents</string>
+    <string name="document_removal_confirmation_message">remove this document?</string>
+    <string name="edit">Edit</string>
+    <string name="done">Done</string>
+</resources>

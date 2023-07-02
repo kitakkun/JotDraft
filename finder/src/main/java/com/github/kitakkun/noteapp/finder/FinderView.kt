@@ -29,6 +29,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.kitakkun.noteapp.customview.preview.PreviewContainer
@@ -77,7 +78,7 @@ fun FinderView(
                 },
                 actions = {
                     TextButton(onClick = onClickEdit) {
-                        Text(text = if (!uiState.isEditMode) "Edit" else "Done")
+                        Text(text = if (!uiState.isEditMode) stringResource(R.string.edit) else stringResource(R.string.done))
                     }
                 }
             )
@@ -112,7 +113,7 @@ private fun EmptyDocumentList(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text("No Documents")
+        Text(stringResource(R.string.no_documents))
         Spacer(modifier = Modifier.height(16.dp))
         Icon(
             imageVector = Icons.Default.LibraryBooks,
