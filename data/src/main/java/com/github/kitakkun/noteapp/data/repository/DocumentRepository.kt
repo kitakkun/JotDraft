@@ -1,7 +1,9 @@
-package com.github.kitakkun.noteapp.data
+package com.github.kitakkun.noteapp.data.repository
 
-import com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor.BaseStyleAnchor
-import com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor.OverrideStyleAnchor
+import com.github.kitakkun.noteapp.data.model.BaseStyleAnchor
+import com.github.kitakkun.noteapp.data.model.OverrideStyleAnchor
+import com.github.kitakkun.noteapp.data.room.DocumentDao
+import com.github.kitakkun.noteapp.data.room.DocumentEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

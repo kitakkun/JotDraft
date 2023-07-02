@@ -1,22 +1,23 @@
 package com.github.kitakkun.noteapp.ui.page.editor.ext
 
-import com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor.OverrideStyleAnchor
-import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.OverrideStyle
+import com.github.kitakkun.noteapp.data.model.OverrideStyle
+import com.github.kitakkun.noteapp.data.model.OverrideStyleAnchor
 
 /**
  * split anchor into two anchors at the given offset.
  * if the [offset] is not in the range of the anchor, the anchor will not be split
  * @param offset the offset to split the anchor at
  */
-fun List<OverrideStyleAnchor>.splitAt(offset: Int) = flatMap { anchor ->
-    val anchorRange = anchor.start until anchor.end
-    val shouldSplit = offset in anchorRange
-    if (shouldSplit) {
-        anchor.split(at = offset)
-    } else {
-        listOf(anchor)
+fun List<OverrideStyleAnchor>.splitAt(offset: Int) =
+    flatMap { anchor ->
+        val anchorRange = anchor.start until anchor.end
+        val shouldSplit = offset in anchorRange
+        if (shouldSplit) {
+            anchor.split(at = offset)
+        } else {
+            listOf(anchor)
+        }
     }
-}
 
 private fun OverrideStyleAnchor.split(at: Int) = listOf(
     copy(start = start, end = at),

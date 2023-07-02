@@ -2,7 +2,7 @@ package com.github.kitakkun.noteapp.ui.page.finder
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.kitakkun.noteapp.data.DocumentRepository
+import com.github.kitakkun.noteapp.data.repository.DocumentRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

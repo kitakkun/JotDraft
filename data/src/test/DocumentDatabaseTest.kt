@@ -4,9 +4,6 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.kitakkun.noteapp.data.DocumentDao
-import com.github.kitakkun.noteapp.data.DocumentDatabase
-import com.github.kitakkun.noteapp.data.DocumentEntity
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before

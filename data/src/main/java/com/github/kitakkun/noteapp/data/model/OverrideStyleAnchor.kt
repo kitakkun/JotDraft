@@ -1,6 +1,4 @@
-package com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor
-
-import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.OverrideStyle
+package com.github.kitakkun.noteapp.data.model
 
 data class OverrideStyleAnchor(
     val start: Int,

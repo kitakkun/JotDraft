@@ -1,7 +1,7 @@
 package com.github.kitakkun.noteapp.ui.page.editor.ext
 
-import com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor.BaseStyleAnchor
-import com.github.kitakkun.noteapp.ui.page.editor.editmodel.style.BaseStyle
+import com.github.kitakkun.noteapp.data.model.BaseStyle
+import com.github.kitakkun.noteapp.data.model.BaseStyleAnchor
 
 /**
  * @param deleteCursorLine base cursor position for deletion

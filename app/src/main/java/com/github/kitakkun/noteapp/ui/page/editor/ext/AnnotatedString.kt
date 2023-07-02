@@ -2,8 +2,8 @@ package com.github.kitakkun.noteapp.ui.page.editor.ext
 
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
-import com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor.BaseStyleAnchor
-import com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor.OverrideStyleAnchor
+import com.github.kitakkun.noteapp.data.model.BaseStyleAnchor
+import com.github.kitakkun.noteapp.data.model.OverrideStyleAnchor
 
 fun AnnotatedString.applyStyles(
     baseStyleAnchors: List<BaseStyleAnchor>,

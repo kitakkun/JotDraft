@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.ui.page.editor.editmodel.style
+package com.github.kitakkun.noteapp.data.model
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.ParagraphStyle

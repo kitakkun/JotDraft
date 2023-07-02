@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.data
+package com.github.kitakkun.noteapp.data.room
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase

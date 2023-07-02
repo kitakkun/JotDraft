@@ -1,10 +1,9 @@
-package com.github.kitakkun.noteapp.ui.page.editor.editmodel.style
+package com.github.kitakkun.noteapp.data.model
 
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
-import com.github.kitakkun.noteapp.ui.page.editor.editmodel.serializer.OverrideStyleTypeAdapter
 import com.google.gson.annotations.JsonAdapter
 
 @JsonAdapter(OverrideStyleTypeAdapter::class)
