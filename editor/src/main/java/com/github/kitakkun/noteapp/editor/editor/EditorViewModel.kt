@@ -11,6 +11,7 @@ import com.github.kitakkun.noteapp.data.model.BaseStyleAnchor
 import com.github.kitakkun.noteapp.data.model.OverrideStyle
 import com.github.kitakkun.noteapp.data.model.OverrideStyleAnchor
 import com.github.kitakkun.noteapp.data.repository.DocumentRepository
+import com.github.kitakkun.noteapp.data.room.DocumentEntity
 import com.github.kitakkun.noteapp.editor.editor.editmodel.EditHistory
 import com.github.kitakkun.noteapp.editor.editor.editmodel.EditorConfig
 import com.github.kitakkun.noteapp.editor.editor.editmodel.TextFieldChangeEvent
@@ -86,11 +87,24 @@ class EditorViewModel(
 
     fun fetchDocumentData() = viewModelScope.launch {
         val document = documentRepository.getDocumentById(uiState.value.documentId) ?: return@launch
+        val recovered = recoverDocumentDataIfNeeded(document)
         mutableUiState.value = uiState.value.copy(
-            documentTitle = document.title,
-            content = TextFieldValue(document.content),
-            baseStyleAnchors = document.baseStyleAnchors,
-            overrideStyleAnchors = document.overrideStyleAnchors,
+            documentTitle = recovered.title,
+            content = TextFieldValue(recovered.content),
+            baseStyleAnchors = recovered.baseStyleAnchors,
+            overrideStyleAnchors = recovered.overrideStyleAnchors,
+        )
+    }
+
+    /**
+     * FIXME: This is a workaround for the bug that the document data is not saved correctly.
+     */
+    private fun recoverDocumentDataIfNeeded(document: DocumentEntity): DocumentEntity {
+        val lineCount = document.content.count { it == '\n' } + 1
+        val textLength = document.content.length
+        return document.copy(
+            baseStyleAnchors = document.baseStyleAnchors.filter { it.isValid(lineCount) },
+            overrideStyleAnchors = document.overrideStyleAnchors.filter { it.isValid() }.filter { it.end <= textLength },
         )
     }
 
