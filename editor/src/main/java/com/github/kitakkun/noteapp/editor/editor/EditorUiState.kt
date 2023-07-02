@@ -32,4 +32,9 @@ data class EditorUiState(
 
     val canUndo: Boolean = false,
     val canRedo: Boolean = false,
+
+    val documentId: String = "",
+    val documentExists: Boolean = false,
+
+    val isSavingDocument: Boolean = false,
 )

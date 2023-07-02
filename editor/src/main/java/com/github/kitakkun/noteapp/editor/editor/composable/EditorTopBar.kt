@@ -21,6 +21,7 @@ fun EditorTopBar(
     title: String,
     undoEnabled: Boolean,
     redoEnabled: Boolean,
+    saveButtonEnabled: Boolean,
     onTitleChange: (String) -> Unit,
     onNavigateBeforeClick: () -> Unit,
     onSaveClick: () -> Unit,
@@ -47,7 +48,7 @@ fun EditorTopBar(
             IconButton(enabled = redoEnabled, onClick = onClickRedo) {
                 Icon(imageVector = Icons.Default.Redo, contentDescription = null)
             }
-            IconButton(onClick = onSaveClick) {
+            IconButton(onClick = onSaveClick, enabled = saveButtonEnabled) {
                 Icon(imageVector = Icons.Default.Save, contentDescription = null)
             }
         }
@@ -66,5 +67,6 @@ private fun EditorTopBarPreview() = PreviewContainer {
         onSaveClick = {},
         onClickRedo = {},
         onClickUndo = {},
+        saveButtonEnabled = true,
     )
 }

@@ -9,26 +9,26 @@ import androidx.room.Update
 @Dao
 interface DocumentDao {
     @Query("SELECT * FROM DocumentEntity")
-    fun getAll(): List<DocumentEntity>
+    suspend fun getAll(): List<DocumentEntity>
 
     @Query("SELECT * FROM DocumentEntity WHERE title LIKE :title")
-    fun findByTitle(title: String): DocumentEntity
+    suspend fun findByTitle(title: String): DocumentEntity
 
     @Insert
-    fun insertAll(vararg documents: DocumentEntity)
+    suspend fun insertAll(vararg documents: DocumentEntity)
 
     @Insert
-    fun insert(document: DocumentEntity)
+    suspend fun insert(document: DocumentEntity)
 
     @Update
-    fun update(document: DocumentEntity)
+    suspend fun update(document: DocumentEntity)
 
     @Delete
-    fun delete(document: DocumentEntity)
+    suspend fun delete(document: DocumentEntity)
 
     @Query("DELETE FROM DocumentEntity WHERE id = :documentId")
-    fun deleteById(documentId: String?)
+    suspend fun deleteById(documentId: String?)
 
     @Query("SELECT * FROM DocumentEntity WHERE id = :documentId")
-    fun getById(documentId: String?): DocumentEntity?
+    suspend fun getById(documentId: String?): DocumentEntity?
 }
