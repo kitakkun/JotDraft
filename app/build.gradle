@@ -70,14 +70,6 @@ dependencies {
     debugImplementation libs.compose.ui.tooling
     debugImplementation libs.compose.ui.test.manifest
 
-    implementation libs.room.common
-    annotationProcessor libs.room.compiler
-    testImplementation libs.room.testing
-    ksp libs.room.compiler.ksp
-    implementation libs.room.ktx
-    implementation libs.kotlinx.serialization
-    implementation libs.gson
-
     implementation libs.koin.core
     implementation libs.koin.android
     implementation libs.koin.compose
