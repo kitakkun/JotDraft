@@ -73,6 +73,7 @@ fun EditorView(
                 title = uiState.documentTitle,
                 undoEnabled = uiState.canUndo,
                 redoEnabled = uiState.canRedo,
+                saveButtonEnabled = !uiState.isSavingDocument,
                 onNavigateBeforeClick = onNavigateUpClick,
                 onSaveClick = onSaveClick,
                 onTitleChange = onTitleChange,

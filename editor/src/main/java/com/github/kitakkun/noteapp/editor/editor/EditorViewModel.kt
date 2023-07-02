@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 
 class EditorViewModel(
-    private val documentId: String?,
+    documentId: String?,
     private val documentRepository: DocumentRepository,
     private val navController: NavController,
     private val historyManager: EditHistoryManager,
@@ -45,7 +45,9 @@ class EditorViewModel(
         EditorUiState(
             baseStyleAnchors = listOf(
                 BaseStyleAnchor(0, BaseStyle.Body)
-            )
+            ),
+            documentId = documentId ?: UUID.randomUUID().toString(),
+            documentExists = documentId != null,
         )
     )
     val uiState = mutableUiState.asStateFlow()
@@ -83,8 +85,7 @@ class EditorViewModel(
     }
 
     fun fetchDocumentData() = viewModelScope.launch {
-        if (documentId == null) return@launch
-        val document = documentRepository.getDocumentById(documentId) ?: return@launch
+        val document = documentRepository.getDocumentById(uiState.value.documentId) ?: return@launch
         mutableUiState.value = uiState.value.copy(
             documentTitle = document.title,
             content = TextFieldValue(document.content),
@@ -94,23 +95,26 @@ class EditorViewModel(
     }
 
     fun saveDocument() = viewModelScope.launch {
-        if (documentId == null) {
-            documentRepository.saveDocument(
-                id = UUID.randomUUID().toString(),
+        mutableUiState.update { it.copy(isSavingDocument = true) }
+        if (uiState.value.documentExists) {
+            documentRepository.updateDocument(
+                id = uiState.value.documentId,
                 title = uiState.value.documentTitle,
                 rawContent = uiState.value.content.text,
                 baseStyleAnchors = uiState.value.baseStyleAnchors,
                 overrideStyleAnchors = uiState.value.overrideStyleAnchors,
             )
         } else {
-            documentRepository.updateDocument(
-                id = documentId,
+            documentRepository.saveDocument(
+                id = uiState.value.documentId,
                 title = uiState.value.documentTitle,
                 rawContent = uiState.value.content.text,
                 baseStyleAnchors = uiState.value.baseStyleAnchors,
                 overrideStyleAnchors = uiState.value.overrideStyleAnchors,
             )
+            mutableUiState.update { it.copy(documentExists = true) }
         }
+        mutableUiState.update { it.copy(isSavingDocument = false) }
     }
 
     fun updateDocumentTitle(title: String) {
@@ -444,8 +448,8 @@ class EditorViewModel(
             .splitAt(orderedSelection.end)
             .filterNot {
                 (it.start >= orderedSelection.start)
-                        && (it.end <= orderedSelection.end)
-                        && (it.style::class == overrideStyle::class)
+                    && (it.end <= orderedSelection.end)
+                    && (it.style::class == overrideStyle::class)
             } + listOf(
             OverrideStyleAnchor(
                 start = orderedSelection.start,
