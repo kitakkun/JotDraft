@@ -29,4 +29,7 @@ data class EditorUiState(
         Color.Red, Color.Green, Color.Blue,
         Color.Yellow, Color.Magenta, Color.Cyan,
     ),
+
+    val canUndo: Boolean = false,
+    val canRedo: Boolean = false,
 )

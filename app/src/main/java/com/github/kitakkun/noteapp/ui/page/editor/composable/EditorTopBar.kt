@@ -3,7 +3,9 @@ package com.github.kitakkun.noteapp.ui.page.editor.composable
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.NavigateBefore
+import androidx.compose.material.icons.filled.Redo
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -17,9 +19,13 @@ import com.github.kitakkun.noteapp.customview.preview.PreviewContainer
 @Composable
 fun EditorTopBar(
     title: String,
+    undoEnabled: Boolean,
+    redoEnabled: Boolean,
     onTitleChange: (String) -> Unit,
     onNavigateBeforeClick: () -> Unit,
     onSaveClick: () -> Unit,
+    onClickRedo: () -> Unit,
+    onClickUndo: () -> Unit,
 ) {
     TopAppBar(
         title = {
@@ -35,6 +41,12 @@ fun EditorTopBar(
             }
         },
         actions = {
+            IconButton(enabled = undoEnabled, onClick = onClickUndo) {
+                Icon(imageVector = Icons.Default.Undo, contentDescription = null)
+            }
+            IconButton(enabled = redoEnabled, onClick = onClickRedo) {
+                Icon(imageVector = Icons.Default.Redo, contentDescription = null)
+            }
             IconButton(onClick = onSaveClick) {
                 Icon(imageVector = Icons.Default.Save, contentDescription = null)
             }
@@ -49,6 +61,10 @@ private fun EditorTopBarPreview() = PreviewContainer {
         title = "Title",
         onNavigateBeforeClick = {},
         onTitleChange = {},
+        redoEnabled = false,
+        undoEnabled = true,
         onSaveClick = {},
+        onClickRedo = {},
+        onClickUndo = {},
     )
 }
