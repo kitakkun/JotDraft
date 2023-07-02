@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.ui.page.finder
+package com.github.kitakkun.noteapp.finder.composable
 
 data class DocumentItemUiState(
     val id: String = "",

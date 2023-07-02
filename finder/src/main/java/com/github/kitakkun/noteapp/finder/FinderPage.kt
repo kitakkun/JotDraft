@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.ui.page.finder
+package com.github.kitakkun.noteapp.finder
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect

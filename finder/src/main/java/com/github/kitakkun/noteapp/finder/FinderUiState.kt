@@ -1,4 +1,6 @@
-package com.github.kitakkun.noteapp.ui.page.finder
+package com.github.kitakkun.noteapp.finder
+
+import com.github.kitakkun.noteapp.finder.composable.DocumentItemUiState
 
 data class FinderUiState(
     val searchWord: String = "",

@@ -51,6 +51,7 @@ android {
 dependencies {
     implementation(project(":data"))
     implementation(project(":customview"))
+    implementation(project(":finder"))
     implementation(project(":navigation"))
 
     implementation platform(libs.compose.bom)

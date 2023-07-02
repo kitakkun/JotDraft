@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.ui.page.finder
+package com.github.kitakkun.noteapp.finder.dialog
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

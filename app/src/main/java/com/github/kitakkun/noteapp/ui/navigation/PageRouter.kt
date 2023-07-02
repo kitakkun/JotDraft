@@ -5,9 +5,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.github.kitakkun.noteapp.finder.FinderPage
 import com.github.kitakkun.noteapp.navigation.MainPage
 import com.github.kitakkun.noteapp.ui.page.editor.EditorPage
-import com.github.kitakkun.noteapp.ui.page.finder.FinderPage
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
