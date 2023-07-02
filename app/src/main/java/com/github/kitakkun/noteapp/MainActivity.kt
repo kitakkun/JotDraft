@@ -8,8 +8,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import com.github.kitakkun.noteapp.ui.navigation.PageRouter
-import com.github.kitakkun.noteapp.ui.theme.NoteAppTheme
+import com.github.kitakkun.noteapp.customview.theme.NoteAppTheme
+import com.github.kitakkun.noteapp.navigation.PageRouter
 
 class MainActivity : ComponentActivity() {
 
