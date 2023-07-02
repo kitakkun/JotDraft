@@ -13,6 +13,10 @@ colorpicker-compose = "1.0.2"
 lifecycle-runtime-ktx = "2.6.1"
 navigation-compose = "2.6.0"
 gson = "2.9.1"
+agp = "8.0.2"
+kotlin = "1.8.21"
+appcompat = "1.6.1"
+material = "1.8.0"
 
 [libraries]
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
@@ -43,3 +47,8 @@ roboletric = { module = "org.robolectric:robolectric", version.ref = "roboletric
 lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle-runtime-ktx" }
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation-compose" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+[plugins]
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
+kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
