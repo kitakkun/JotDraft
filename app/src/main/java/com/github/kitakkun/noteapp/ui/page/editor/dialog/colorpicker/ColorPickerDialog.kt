@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.github.kitakkun.noteapp.R
-import com.github.kitakkun.noteapp.ui.preview.PreviewContainer
+import com.github.kitakkun.noteapp.customview.preview.PreviewContainer
 import com.github.skydoves.colorpicker.compose.AlphaSlider
 import com.github.skydoves.colorpicker.compose.AlphaTile
 import com.github.skydoves.colorpicker.compose.BrightnessSlider

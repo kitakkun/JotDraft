@@ -13,7 +13,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.github.kitakkun.noteapp.ui.preview.PreviewContainer
+import com.github.kitakkun.noteapp.customview.preview.PreviewContainer
 
 @Composable
 fun ColorCircle(

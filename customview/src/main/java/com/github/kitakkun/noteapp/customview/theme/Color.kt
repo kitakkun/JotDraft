@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.ui.theme
+package com.github.kitakkun.noteapp.customview.theme
 
 import androidx.compose.ui.graphics.Color
 

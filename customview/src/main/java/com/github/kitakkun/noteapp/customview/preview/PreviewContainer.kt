@@ -1,8 +1,8 @@
-package com.github.kitakkun.noteapp.ui.preview
+package com.github.kitakkun.noteapp.customview.preview
 
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import com.github.kitakkun.noteapp.ui.theme.NoteAppTheme
+import com.github.kitakkun.noteapp.customview.theme.NoteAppTheme
 
 @Composable
 fun PreviewContainer(content: @Composable () -> Unit) {

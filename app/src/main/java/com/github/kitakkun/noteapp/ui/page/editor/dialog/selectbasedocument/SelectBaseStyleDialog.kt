@@ -14,8 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.github.kitakkun.noteapp.customview.preview.PreviewContainer
 import com.github.kitakkun.noteapp.data.model.BaseStyle
-import com.github.kitakkun.noteapp.ui.preview.PreviewContainer
 
 @Composable
 fun SelectBaseStyleDialog(

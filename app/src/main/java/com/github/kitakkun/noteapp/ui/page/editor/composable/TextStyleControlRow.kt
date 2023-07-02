@@ -25,8 +25,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.github.kitakkun.noteapp.customview.preview.PreviewContainer
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.EditorConfig
-import com.github.kitakkun.noteapp.ui.preview.PreviewContainer
 
 @Composable
 fun TextStyleControlRow(

@@ -14,6 +14,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.github.kitakkun.noteapp.customview.preview.PreviewContainer
 import com.github.kitakkun.noteapp.data.model.BaseStyle
 import com.github.kitakkun.noteapp.ui.page.editor.composable.EditorTopBar
 import com.github.kitakkun.noteapp.ui.page.editor.composable.TextStyleControlRow
@@ -21,7 +22,6 @@ import com.github.kitakkun.noteapp.ui.page.editor.dialog.colorpicker.ColorPicker
 import com.github.kitakkun.noteapp.ui.page.editor.dialog.colorselect.SelectColorDialog
 import com.github.kitakkun.noteapp.ui.page.editor.dialog.selectbasedocument.SelectBaseStyleDialog
 import com.github.kitakkun.noteapp.ui.page.editor.ext.applyStyles
-import com.github.kitakkun.noteapp.ui.preview.PreviewContainer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
