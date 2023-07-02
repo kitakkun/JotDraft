@@ -4,4 +4,5 @@
     <string name="document_removal_confirmation_message">remove this document?</string>
     <string name="edit">Edit</string>
     <string name="done">Done</string>
+    <string name="oss_licenses">OSS Licenses</string>
 </resources>

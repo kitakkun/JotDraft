@@ -2,6 +2,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.aboutLibraries)
 }
 
 apply(from = "${project.rootDir}/gradle/common.gradle")

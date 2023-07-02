@@ -13,6 +13,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navigation
 import com.github.kitakkun.noteapp.editor.editor.EditorPage
 import com.github.kitakkun.noteapp.finder.FinderPage
+import com.github.kitakkun.noteapp.license.LicensePage
 import com.github.kitakkun.noteapp.setting.SettingPage
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -58,6 +59,7 @@ fun PageRouter(
                 composable(route = MainPage.Setting.route) {
                     SettingPage(
                         viewModel = koinViewModel(),
+                        navController = navController,
                     )
                 }
                 composable(route = MainPage.Editor.routeWithArgs) {
@@ -67,6 +69,11 @@ fun PageRouter(
                 }
                 composable(route = MainPage.Editor.route) {
                     EditorPage(viewModel = koinViewModel { parametersOf(null, navController) })
+                }
+                composable(route = SubPage.License.route) {
+                    LicensePage(
+                        navController = navController,
+                    )
                 }
             }
         }
