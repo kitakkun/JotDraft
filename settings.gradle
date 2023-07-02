@@ -16,3 +16,4 @@ rootProject.name = "NoteApp"
 include ':app'
 include ':finder'
 include ':data'
+include ':customview'
