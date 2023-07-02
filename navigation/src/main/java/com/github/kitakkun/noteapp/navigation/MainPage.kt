@@ -4,6 +4,8 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 
 object MainPage : Page(route = "main") {
+    object Setting : Page(route = "setting")
+
     object Finder : Page(route = "finder")
     object Editor : Page(
         route = "editor",
