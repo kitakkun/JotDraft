@@ -41,5 +41,7 @@ fun EditorPage(
         onDismissSelectColorDialog = viewModel::dismissSelectColorDialog,
         onTextColorIconClick = viewModel::showSelectColorDialog,
         onTitleChange = viewModel::updateDocumentTitle,
+        onClickRedo = viewModel::redo,
+        onClickUndo = viewModel::undo,
     )
 }

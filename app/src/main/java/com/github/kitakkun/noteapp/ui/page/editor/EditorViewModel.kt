@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.github.kitakkun.noteapp.data.DocumentRepository
+import com.github.kitakkun.noteapp.ui.page.editor.editmodel.EditHistory
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.EditorConfig
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.TextFieldChangeEvent
 import com.github.kitakkun.noteapp.ui.page.editor.editmodel.anchor.BaseStyleAnchor
@@ -20,8 +21,11 @@ import com.github.kitakkun.noteapp.ui.page.editor.ext.shiftToLeft
 import com.github.kitakkun.noteapp.ui.page.editor.ext.shiftToRight
 import com.github.kitakkun.noteapp.ui.page.editor.ext.splitAt
 import com.github.kitakkun.noteapp.ui.page.editor.ext.toValidOrder
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -30,9 +34,11 @@ class EditorViewModel(
     private val documentId: String?,
     private val documentRepository: DocumentRepository,
     private val navController: NavController,
+    private val historyManager: EditHistoryManager,
 ) : ViewModel() {
     companion object {
         private const val TAG = "EditorViewModel"
+        private const val IDLE_TIME_TO_SAVE_HISTORY = 2000L
     }
 
     private val mutableUiState = MutableStateFlow(
@@ -43,6 +49,38 @@ class EditorViewModel(
         )
     )
     val uiState = mutableUiState.asStateFlow()
+
+    private val lastEditTimeFlow: MutableSharedFlow<Long> = MutableSharedFlow()
+    private val saveHistoryFlow: MutableSharedFlow<EditHistory> = MutableSharedFlow()
+
+    init {
+        viewModelScope.launch {
+            lastEditTimeFlow
+                .distinctUntilChanged { old, new -> new - old < IDLE_TIME_TO_SAVE_HISTORY }
+                .map {
+                    EditHistory(
+                        content = uiState.value.content,
+                        baseStyleAnchors = uiState.value.baseStyleAnchors,
+                        overrideStyleAnchors = uiState.value.overrideStyleAnchors,
+                    )
+                }
+                .distinctUntilChanged { old, new -> old.content.text == new.content.text }
+                .collect { history ->
+                    saveHistoryFlow.emit(history)
+                }
+        }
+
+        viewModelScope.launch {
+            saveHistoryFlow.collect { history ->
+                historyManager.pushUndo(history)
+                historyManager.clearRedo()
+                mutableUiState.update {
+                    it.copy(canRedo = historyManager.canRedo, canUndo = historyManager.canUndo)
+                }
+            }
+
+        }
+    }
 
     fun fetchDocumentData() = viewModelScope.launch {
         if (documentId == null) return@launch
@@ -121,10 +159,25 @@ class EditorViewModel(
                 editorConfig = newEditorConfig,
             )
         }
+
+        viewModelScope.launch {
+            lastEditTimeFlow.emit(System.currentTimeMillis())
+        }
     }
 
     fun toggleBold() {
         val toggledIsBold = !uiState.value.editorConfig.isBold
+        if (!uiState.value.content.selection.collapsed) {
+            viewModelScope.launch {
+                saveHistoryFlow.emit(
+                    EditHistory(
+                        content = uiState.value.content,
+                        overrideStyleAnchors = uiState.value.overrideStyleAnchors,
+                        baseStyleAnchors = uiState.value.baseStyleAnchors,
+                    )
+                )
+            }
+        }
         mutableUiState.update {
             it.copy(
                 editorConfig = it.editorConfig.copy(isBold = toggledIsBold),
@@ -139,6 +192,17 @@ class EditorViewModel(
 
     fun toggleItalic() {
         val toggledIsItalic = !uiState.value.editorConfig.isItalic
+        if (!uiState.value.content.selection.collapsed) {
+            viewModelScope.launch {
+                saveHistoryFlow.emit(
+                    EditHistory(
+                        content = uiState.value.content,
+                        overrideStyleAnchors = uiState.value.overrideStyleAnchors,
+                        baseStyleAnchors = uiState.value.baseStyleAnchors,
+                    )
+                )
+            }
+        }
         mutableUiState.update {
             it.copy(
                 editorConfig = it.editorConfig.copy(isItalic = toggledIsItalic),
@@ -173,13 +237,24 @@ class EditorViewModel(
     }
 
     fun updateCurrentColor(color: Color) {
-        mutableUiState.update {
-            it.copy(
-                editorConfig = it.editorConfig.copy(color = color),
+        if (!uiState.value.content.selection.collapsed) {
+            viewModelScope.launch {
+                saveHistoryFlow.emit(
+                    EditHistory(
+                        content = uiState.value.content,
+                        overrideStyleAnchors = uiState.value.overrideStyleAnchors,
+                        baseStyleAnchors = uiState.value.baseStyleAnchors,
+                    )
+                )
+            }
+        }
+        mutableUiState.update { uiState ->
+            uiState.copy(
+                editorConfig = uiState.editorConfig.copy(color = color),
                 overrideStyleAnchors = toggleOverrideStyleOfSelection(
-                    selection = it.content.selection,
+                    selection = uiState.content.selection,
                     overrideStyle = OverrideStyle.Color(color),
-                    overrideAnchors = it.overrideStyleAnchors,
+                    overrideAnchors = uiState.overrideStyleAnchors,
                 ),
             )
         }
@@ -364,7 +439,7 @@ class EditorViewModel(
     ): List<OverrideStyleAnchor> {
         if (selection.collapsed) return overrideAnchors
         val orderedSelection = selection.toValidOrder()
-        return uiState.value.overrideStyleAnchors
+        val newAnchors = uiState.value.overrideStyleAnchors
             .splitAt(orderedSelection.start)
             .splitAt(orderedSelection.end)
             .filterNot {
@@ -378,6 +453,7 @@ class EditorViewModel(
                 style = overrideStyle,
             )
         )
+        return newAnchors
     }
 
     private fun TextFieldValue.getLineAtStartCursor(): Int {
@@ -392,5 +468,45 @@ class EditorViewModel(
         if (cursorPosition == 0) return 0
         val textBeforeCursor = this.text.substring(0, cursorPosition)
         return textBeforeCursor.count { it == '\n' }
+    }
+
+    fun redo() {
+        val history = historyManager.popRedo() ?: return
+        historyManager.pushUndo(
+            EditHistory(
+                content = uiState.value.content,
+                overrideStyleAnchors = uiState.value.overrideStyleAnchors,
+                baseStyleAnchors = uiState.value.baseStyleAnchors,
+            )
+        )
+        mutableUiState.update {
+            it.copy(
+                content = history.content,
+                overrideStyleAnchors = history.overrideStyleAnchors,
+                baseStyleAnchors = history.baseStyleAnchors,
+                canRedo = historyManager.canRedo,
+                canUndo = historyManager.canUndo,
+            )
+        }
+    }
+
+    fun undo() {
+        val history = historyManager.popUndo() ?: return
+        historyManager.pushRedo(
+            EditHistory(
+                content = uiState.value.content,
+                overrideStyleAnchors = uiState.value.overrideStyleAnchors,
+                baseStyleAnchors = uiState.value.baseStyleAnchors,
+            )
+        )
+        mutableUiState.update {
+            it.copy(
+                content = history.content,
+                overrideStyleAnchors = history.overrideStyleAnchors,
+                baseStyleAnchors = history.baseStyleAnchors,
+                canRedo = historyManager.canRedo,
+                canUndo = historyManager.canUndo,
+            )
+        }
     }
 }
