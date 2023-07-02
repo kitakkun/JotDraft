@@ -52,6 +52,7 @@ dependencies {
     implementation(project(":data"))
     implementation(project(":customview"))
     implementation(project(":finder"))
+    implementation(project(":editor"))
     implementation(project(":navigation"))
 
     implementation platform(libs.compose.bom)
