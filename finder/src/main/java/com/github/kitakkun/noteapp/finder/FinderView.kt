@@ -2,12 +2,19 @@ package com.github.kitakkun.noteapp.finder
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LibraryBooks
 import androidx.compose.material.icons.filled.NoteAdd
 import androidx.compose.material.icons.filled.RemoveCircleOutline
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,10 +33,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.kitakkun.noteapp.customview.preview.PreviewContainer
 import com.github.kitakkun.noteapp.finder.composable.DocumentItem
+import com.github.kitakkun.noteapp.finder.composable.DocumentItemUiState
 import com.github.kitakkun.noteapp.finder.composable.SearchField
 import com.github.kitakkun.noteapp.finder.dialog.ConfirmRemovalDialog
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FinderView(
     uiState: FinderUiState,
@@ -80,30 +88,73 @@ fun FinderView(
             }
         },
     ) { innerPadding ->
-        LazyColumn(
-            contentPadding = innerPadding,
-        ) {
-            items(uiState.documents.filter { it.title.contains(uiState.searchWord) }) {
-                if (it.isDeleted) return@items
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.animateItemPlacement(),
-                ) {
-                    AnimatedVisibility(visible = uiState.isEditMode) {
-                        IconButton(onClick = { onClickRemove(it.id) }) {
-                            Icon(
-                                imageVector = Icons.Default.RemoveCircleOutline,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.error,
-                            )
-                        }
+        if (uiState.documents.filter { !it.isDeleted }.isEmpty()) {
+            EmptyDocumentList(modifier = Modifier.fillMaxSize())
+        } else {
+            DocumentList(
+                documents = uiState.documents,
+                searchWord = uiState.searchWord,
+                isEditMode = uiState.isEditMode,
+                onClickRemoveDocument = onClickRemove,
+                onClickDocument = onClickDocumentItem,
+                modifier = Modifier.padding(innerPadding),
+            )
+        }
+    }
+}
+
+@Composable
+private fun EmptyDocumentList(
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text("No Documents")
+        Spacer(modifier = Modifier.height(16.dp))
+        Icon(
+            imageVector = Icons.Default.LibraryBooks,
+            contentDescription = null,
+            modifier = Modifier.size(64.dp)
+        )
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun DocumentList(
+    documents: List<DocumentItemUiState>,
+    searchWord: String,
+    isEditMode: Boolean,
+    onClickRemoveDocument: (documentId: String) -> Unit,
+    onClickDocument: (documentId: String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    LazyColumn(
+        modifier = modifier,
+    ) {
+        items(documents.filter { it.title.contains(searchWord) }) {
+            if (it.isDeleted) return@items
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.animateItemPlacement(),
+            ) {
+                AnimatedVisibility(visible = isEditMode) {
+                    IconButton(onClick = { onClickRemoveDocument(it.id) }) {
+                        Icon(
+                            imageVector = Icons.Default.RemoveCircleOutline,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.error,
+                        )
                     }
-                    DocumentItem(
-                        uiState = it,
-                        onClick = { onClickDocumentItem(it.id) },
-                        onClickEnabled = !uiState.isEditMode,
-                    )
                 }
+                DocumentItem(
+                    uiState = it,
+                    onClick = { onClickDocument(it.id) },
+                    onClickEnabled = !isEditMode,
+                )
             }
         }
     }
@@ -114,6 +165,21 @@ fun FinderView(
 private fun FinderViewPreview() = PreviewContainer {
     FinderView(
         uiState = FinderUiState.buildPreviewData(),
+        onClickAddDocument = {},
+        onClickDocumentItem = {},
+        onChangeSearchWord = {},
+        onClickEdit = {},
+        onClickRemove = {},
+        onClickCancelConfirmRemovalDialog = {},
+        onClickYesConfirmRemovalDialog = {},
+    )
+}
+
+@Preview
+@Composable
+private fun FinderViewEmptyPreview() = PreviewContainer {
+    FinderView(
+        uiState = FinderUiState.buildPreviewData().copy(documents = emptyList()),
         onClickAddDocument = {},
         onClickDocumentItem = {},
         onChangeSearchWord = {},
