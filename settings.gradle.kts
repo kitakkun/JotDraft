@@ -13,9 +13,9 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "NoteApp"
-include ':app'
-include ':finder'
-include ':data'
-include ':customview'
-include ':navigation'
-include ':editor'
+include(":app")
+include(":finder")
+include(":data")
+include(":customview")
+include(":navigation")
+include(":editor")
