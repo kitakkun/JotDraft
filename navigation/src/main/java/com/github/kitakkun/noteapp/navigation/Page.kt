@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.ui.navigation
+package com.github.kitakkun.noteapp.navigation
 
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry

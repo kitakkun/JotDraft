@@ -51,6 +51,7 @@ android {
 dependencies {
     implementation(project(":data"))
     implementation(project(":customview"))
+    implementation(project(":navigation"))
 
     implementation platform(libs.compose.bom)
     implementation libs.compose.material3

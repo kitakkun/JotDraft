@@ -5,7 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavController
-import com.github.kitakkun.noteapp.ui.navigation.MainPage
+import com.github.kitakkun.noteapp.navigation.MainPage
 
 @Composable
 fun FinderPage(
