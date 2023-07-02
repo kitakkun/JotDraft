@@ -4,19 +4,13 @@ plugins {
     alias(libs.plugins.kotlinAndroid)
 }
 
+apply(from = "${project.rootDir}/gradle/common.gradle")
+
 android {
-    compileSdk = 33
     namespace = "com.github.kitakkun.noteapp"
 
     defaultConfig {
         applicationId = "com.github.kitakkun.noteapp"
-        minSdk = 24
-        targetSdk = 33
-        versionCode = 1
-        versionName = "1.0"
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables.useSupportLibrary = true
     }
 
     buildTypes {
@@ -25,18 +19,9 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
+
     buildFeatures {
         compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.7"
     }
     packagingOptions {
         resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
