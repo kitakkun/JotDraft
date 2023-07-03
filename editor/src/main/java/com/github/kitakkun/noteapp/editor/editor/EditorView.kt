@@ -1,18 +1,31 @@
 package com.github.kitakkun.noteapp.editor.editor
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.github.kitakkun.noteapp.customview.preview.PreviewContainer
 import com.github.kitakkun.noteapp.data.model.BaseStyle
 import com.github.kitakkun.noteapp.editor.editor.composable.EditorTopBar
@@ -85,23 +98,61 @@ fun EditorView(
         Column(
             modifier = Modifier.padding(innerPadding)
         ) {
-            BasicTextField(
-                value = uiState.content,
-                onValueChange = onContentChange,
+            val pairs = remember { mutableStateOf(listOf<Pair<Float, Float>>()) }
+            val scrollState = rememberScrollState()
+            Row(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .weight(1f)
                     .padding(horizontal = 8.dp)
-                    .weight(1f),
-                visualTransformation = {
-                    TransformedText(
-                        text = it.applyStyles(
-                            baseStyleAnchors = uiState.baseStyleAnchors,
-                            overrideStyleAnchors = uiState.overrideStyleAnchors
-                        ),
-                        offsetMapping = OffsetMapping.Identity,
-                    )
-                }
-            )
+            ) {
+                val density = LocalDensity.current
+                Canvas(
+                    modifier = Modifier
+                        .width(30.dp)
+                        .offset(y = with(density) { -scrollState.value.toDp() })
+                        .fillMaxHeight(),
+                    onDraw = {
+                        drawIntoCanvas { canvas ->
+                            pairs.value.forEachIndexed { index, it ->
+                                canvas.nativeCanvas.drawText(
+                                    index.toString(),
+                                    0f,
+                                    (it.first + it.second + 24.sp.toPx()) / 2f,
+                                    android.graphics.Paint().apply {
+                                        color = android.graphics.Color.RED
+                                        textSize = 24.sp.toPx()
+                                    }
+                                )
+                            }
+                        }
+                    }
+                )
+                BasicTextField(
+                    value = uiState.content,
+                    onValueChange = onContentChange,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                        .padding(horizontal = 8.dp)
+                        .verticalScroll(scrollState)
+                        .weight(1f),
+                    visualTransformation = {
+                        TransformedText(
+                            text = it.applyStyles(
+                                baseStyleAnchors = uiState.baseStyleAnchors,
+                                overrideStyleAnchors = uiState.overrideStyleAnchors
+                            ),
+                            offsetMapping = OffsetMapping.Identity,
+                        )
+                    },
+                    onTextLayout = { result ->
+                        val lines = 0 until result.lineCount
+                        pairs.value = lines.filter { it % 2 == 0 }.map {
+                            result.multiParagraph.getLineTop(it) to result.multiParagraph.getLineBottom(it)
+                        }
+                    }
+                )
+            }
             TextStyleControlRow(
                 config = uiState.editorConfig,
                 color = uiState.editorConfig.color,
