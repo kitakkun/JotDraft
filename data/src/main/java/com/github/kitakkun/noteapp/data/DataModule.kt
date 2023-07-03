@@ -4,6 +4,7 @@ import androidx.room.Room
 import com.github.kitakkun.noteapp.data.repository.DocumentRepository
 import com.github.kitakkun.noteapp.data.room.DOCUMENT_MIGRATION_V1_V2
 import com.github.kitakkun.noteapp.data.room.DocumentDatabase
+import com.github.kitakkun.noteapp.data.store.SettingDataStore
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
@@ -18,4 +19,5 @@ val dataModule = module {
         ).addMigrations(DOCUMENT_MIGRATION_V1_V2).build()
     }
     single { get<DocumentDatabase>().documentDao() }
+    singleOf(::SettingDataStore)
 }

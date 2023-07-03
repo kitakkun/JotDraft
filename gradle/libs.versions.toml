@@ -1,5 +1,6 @@
 [versions]
 compose-bom = "2023.06.01"
+datastore-preferences = "1.0.0"
 koin = "3.4.2"
 room = "2.5.2"
 junit = "4.13.2"
@@ -9,13 +10,14 @@ activity-compose = "1.7.2"
 core-ktx = "1.10.1"
 colorpicker-compose = "1.0.2"
 lifecycle-runtime-ktx = "2.6.1"
-navigation-compose = "2.6.0"
+navigation-compose = "2.7.0-beta02"
 gson = "2.9.1"
-agp = "8.0.2"
+agp = "8.2.0-alpha10"
 kotlin = "1.8.21"
 appcompat = "1.6.1"
 material = "1.8.0"
 ksp = "1.8.21-1.0.11"
+aboutlibraries = "10.8.0"
 
 [libraries]
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
@@ -28,6 +30,7 @@ compose-material3 = { module = "androidx.compose.material3:material3" }
 compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
 core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
+datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore-preferences" }
 room-common = { module = "androidx.room:room-common", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 room-testing = { module = "androidx.room:room-testing", version.ref = "room" }
@@ -46,8 +49,11 @@ navigation-compose = { module = "androidx.navigation:navigation-compose", versio
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutlibraries" }
+aboutlibraries-compose = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutlibraries" }
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+aboutLibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutlibraries" }

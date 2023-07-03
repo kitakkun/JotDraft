@@ -2,6 +2,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.aboutLibraries)
 }
 
 apply(from = "${project.rootDir}/gradle/common.gradle")
@@ -11,6 +12,8 @@ android {
 
     defaultConfig {
         applicationId = "com.github.kitakkun.noteapp"
+        versionName = "1.0.0"
+        versionCode = 1
     }
 
     buildTypes {
@@ -23,7 +26,7 @@ android {
     buildFeatures {
         compose = true
     }
-    packagingOptions {
+    packaging {
         resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
     }
 }
@@ -39,6 +42,7 @@ dependencies {
     implementation(libs.compose.material3)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.ui.tooling)
     implementation(libs.compose.material.icons.extended)
     implementation(libs.activity.compose)
     implementation(libs.core.ktx)
