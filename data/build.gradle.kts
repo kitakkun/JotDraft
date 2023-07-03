@@ -38,6 +38,9 @@ dependencies {
     implementation(libs.room.ktx)
     testImplementation(libs.room.testing)
 
+    // Preferences DataStore (SharedPreferences like APIs)
+    implementation(libs.datastore.preferences)
+
     implementation(libs.koin.core)
     implementation(libs.koin.android)
 
