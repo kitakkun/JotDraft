@@ -12,6 +12,7 @@ val editorModule = module {
             documentRepository = get(),
             navController = navController,
             historyManager = get(),
+            settingDataStore = get(),
         )
     }
     factoryOf(::EditHistoryManager)

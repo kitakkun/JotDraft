@@ -1,9 +1,7 @@
 package com.github.kitakkun.noteapp.editor.editor
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -12,9 +10,9 @@ import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.github.kitakkun.noteapp.customview.preview.PreviewContainer
 import com.github.kitakkun.noteapp.data.model.BaseStyle
+import com.github.kitakkun.noteapp.editor.editor.composable.EditorTextField
 import com.github.kitakkun.noteapp.editor.editor.composable.EditorTopBar
 import com.github.kitakkun.noteapp.editor.editor.composable.TextStyleControlRow
 import com.github.kitakkun.noteapp.editor.editor.dialog.colorpicker.ColorPickerDialog
@@ -85,13 +83,10 @@ fun EditorView(
         Column(
             modifier = Modifier.padding(innerPadding)
         ) {
-            BasicTextField(
+            EditorTextField(
                 value = uiState.content,
+                showLineNumber = uiState.showLineNumber,
                 onValueChange = onContentChange,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp)
-                    .weight(1f),
                 visualTransformation = {
                     TransformedText(
                         text = it.applyStyles(
@@ -100,7 +95,8 @@ fun EditorView(
                         ),
                         offsetMapping = OffsetMapping.Identity,
                     )
-                }
+                },
+                modifier = Modifier.weight(1f)
             )
             TextStyleControlRow(
                 config = uiState.editorConfig,

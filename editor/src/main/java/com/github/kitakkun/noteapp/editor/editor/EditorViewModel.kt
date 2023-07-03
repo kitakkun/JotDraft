@@ -12,6 +12,7 @@ import com.github.kitakkun.noteapp.data.model.OverrideStyle
 import com.github.kitakkun.noteapp.data.model.OverrideStyleAnchor
 import com.github.kitakkun.noteapp.data.repository.DocumentRepository
 import com.github.kitakkun.noteapp.data.room.DocumentEntity
+import com.github.kitakkun.noteapp.data.store.SettingDataStore
 import com.github.kitakkun.noteapp.editor.editor.editmodel.EditHistory
 import com.github.kitakkun.noteapp.editor.editor.editmodel.EditorConfig
 import com.github.kitakkun.noteapp.editor.editor.editmodel.TextFieldChangeEvent
@@ -34,6 +35,7 @@ import java.util.UUID
 class EditorViewModel(
     documentId: String?,
     private val documentRepository: DocumentRepository,
+    private val settingDataStore: SettingDataStore,
     private val navController: NavController,
     private val historyManager: EditHistoryManager,
 ) : ViewModel() {
@@ -57,6 +59,11 @@ class EditorViewModel(
     private val saveHistoryFlow: MutableSharedFlow<EditHistory> = MutableSharedFlow()
 
     init {
+        viewModelScope.launch {
+            settingDataStore.showLineNumberFlow.collect { enabled ->
+                mutableUiState.update { it.copy(showLineNumber = enabled) }
+            }
+        }
         viewModelScope.launch {
             lastEditTimeFlow
                 .distinctUntilChanged { old, new -> new - old < IDLE_TIME_TO_SAVE_HISTORY }
