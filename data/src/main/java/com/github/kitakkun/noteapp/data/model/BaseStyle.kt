@@ -21,7 +21,7 @@ enum class BaseStyle(
         color = Color.Black,
         fontSize = 25.sp,
         letterSpacing = 0.sp,
-        lineHeight = 1.2.em,
+        lineHeight = 25.sp,
         lineBreak = LineBreak.Paragraph,
         fontWeight = FontWeight.ExtraBold,
     ),
@@ -29,7 +29,7 @@ enum class BaseStyle(
         color = Color.Black,
         fontSize = 20.sp,
         letterSpacing = 0.sp,
-        lineHeight = 1.2.em,
+        lineHeight = 20.sp,
         lineBreak = LineBreak.Paragraph,
         fontWeight = FontWeight.Bold,
     ),
@@ -37,7 +37,7 @@ enum class BaseStyle(
         color = Color.Black,
         fontSize = 17.sp,
         letterSpacing = 0.5.sp,
-        lineHeight = 1.5.em,
+        lineHeight = 17.sp,
     );
 
     val spanStyle = SpanStyle(
