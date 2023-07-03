@@ -37,4 +37,5 @@ data class EditorUiState(
     val documentExists: Boolean = false,
 
     val isSavingDocument: Boolean = false,
+    val showLineNumber: Boolean = false,
 )

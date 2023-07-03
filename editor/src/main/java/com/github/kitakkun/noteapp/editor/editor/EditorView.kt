@@ -85,6 +85,7 @@ fun EditorView(
         ) {
             EditorTextField(
                 value = uiState.content,
+                showLineNumber = uiState.showLineNumber,
                 onValueChange = onContentChange,
                 visualTransformation = {
                     TransformedText(

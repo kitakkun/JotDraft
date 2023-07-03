@@ -31,6 +31,7 @@ fun EditorTextField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     visualTransformation: VisualTransformation,
+    showLineNumber: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val density = LocalDensity.current
@@ -54,21 +55,23 @@ fun EditorTextField(
     }
 
     Row(modifier = modifier) {
-        Canvas(
-            modifier = Modifier
-                .width(30.dp)
-                .offset(y = -scrollOffsetDp.value)
-                .fillMaxHeight(),
-            onDraw = {
-                drawIntoCanvas { canvas ->
-                    lineNumberDrawOffsetRanges.value.forEachIndexed { index, it ->
-                        canvas.nativeCanvas.drawText(
-                            index.toString(), 0f, (it.lower + it.upper + lineNumberFontSize) / 2f, lineNumberPaint
-                        )
+        if (showLineNumber) {
+            Canvas(
+                modifier = Modifier
+                    .width(30.dp)
+                    .offset(y = -scrollOffsetDp.value)
+                    .fillMaxHeight(),
+                onDraw = {
+                    drawIntoCanvas { canvas ->
+                        lineNumberDrawOffsetRanges.value.forEachIndexed { index, it ->
+                            canvas.nativeCanvas.drawText(
+                                index.toString(), 0f, (it.lower + it.upper + lineNumberFontSize) / 2f, lineNumberPaint
+                            )
+                        }
                     }
                 }
-            }
-        )
+            )
+        }
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
@@ -79,6 +82,8 @@ fun EditorTextField(
                 .weight(1f),
             visualTransformation = visualTransformation,
             onTextLayout = { result ->
+                // avoid needless calculation
+                if (!showLineNumber) return@BasicTextField
                 // lineCount is increment by 1 when line is wrapped.
                 // but when inserted a single linebreak, lineCount will be incremented by 2.
                 val lineBreakOffsets = listOf(0) + value.text.mapIndexedNotNull { index, c ->
