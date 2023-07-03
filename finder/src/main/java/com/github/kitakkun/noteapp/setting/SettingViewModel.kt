@@ -3,12 +3,13 @@ package com.github.kitakkun.noteapp.setting
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 class SettingViewModel : ViewModel() {
-    var mutableIsAutoSaveEnabled = MutableStateFlow(false)
-    val isAutoSaveEnabled = mutableIsAutoSaveEnabled.asStateFlow()
+    private val mutableUiState = MutableStateFlow(SettingUiState())
+    val uiState = mutableUiState.asStateFlow()
 
     fun setAutoSaveEnabled(isEnabled: Boolean) {
-        mutableIsAutoSaveEnabled.value = isEnabled
+        mutableUiState.update { it.copy(isAutoSaveEnabled = isEnabled) }
     }
 }

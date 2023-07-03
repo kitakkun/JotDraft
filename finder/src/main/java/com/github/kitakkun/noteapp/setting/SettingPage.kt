@@ -11,10 +11,10 @@ fun SettingPage(
     viewModel: SettingViewModel,
     navController: NavController,
 ) {
-    val isAutoSaveEnabled = viewModel.isAutoSaveEnabled.collectAsState()
+    val uiState = viewModel.uiState.collectAsState()
     val uriHandler = LocalUriHandler.current
     SettingView(
-        isAutoSaveEnabled = isAutoSaveEnabled.value,
+        isAutoSaveEnabled = uiState.value.isAutoSaveEnabled,
         onChangedAutoSaveEnabled = viewModel::setAutoSaveEnabled,
         onClickOSSLicense = { navController.navigate(SubPage.License.route) },
         onClickDeveloper = {
