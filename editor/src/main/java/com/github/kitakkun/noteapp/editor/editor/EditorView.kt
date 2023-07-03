@@ -146,8 +146,13 @@ fun EditorView(
                         )
                     },
                     onTextLayout = { result ->
-                        val lines = 0 until result.lineCount
-                        pairs.value = lines.filter { it % 2 == 0 }.map {
+                        // lineCount is increment by 1 when line is wrapped.
+                        // but when inserted a single linebreak, lineCount will be incremented by 2.
+                        val lineBreakOffsets = uiState.content.text.mapIndexedNotNull { index, c ->
+                            if (c == '\n') index else null
+                        }
+                        val lineBreakLines = lineBreakOffsets.map { result.getLineForOffset(it) }
+                        pairs.value = lineBreakLines.map {
                             result.multiParagraph.getLineTop(it) to result.multiParagraph.getLineBottom(it)
                         }
                     }
