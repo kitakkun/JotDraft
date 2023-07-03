@@ -82,7 +82,7 @@ fun SettingView(
                 label = stringResource(R.string.version),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "1.0.0")
+                Text(text = getAppVersion())
             }
         }
         item {

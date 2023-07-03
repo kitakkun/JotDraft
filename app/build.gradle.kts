@@ -12,6 +12,8 @@ android {
 
     defaultConfig {
         applicationId = "com.github.kitakkun.noteapp"
+        versionName = "1.0.0"
+        versionCode = 1
     }
 
     buildTypes {
