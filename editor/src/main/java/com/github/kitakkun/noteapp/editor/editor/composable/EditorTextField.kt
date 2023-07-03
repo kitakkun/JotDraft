@@ -81,8 +81,8 @@ fun EditorTextField(
             onTextLayout = { result ->
                 // lineCount is increment by 1 when line is wrapped.
                 // but when inserted a single linebreak, lineCount will be incremented by 2.
-                val lineBreakOffsets = value.text.mapIndexedNotNull { index, c ->
-                    if (c == '\n') index else null
+                val lineBreakOffsets = listOf(0) + value.text.mapIndexedNotNull { index, c ->
+                    if (c == '\n') index + 1 else null
                 }
                 val lineBreakLines = lineBreakOffsets.map { result.getLineForOffset(it) }
                 lineNumberDrawOffsetRanges.value = lineBreakLines.map {
