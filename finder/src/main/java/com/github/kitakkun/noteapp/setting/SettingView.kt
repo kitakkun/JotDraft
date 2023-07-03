@@ -29,8 +29,9 @@ import com.github.kitakkun.noteapp.finder.R
 
 @Composable
 fun SettingView(
-    isAutoSaveEnabled: Boolean,
+    uiState: SettingUiState,
     onChangedAutoSaveEnabled: (Boolean) -> Unit,
+    onChangedShowLineNumber: (Boolean) -> Unit,
     onClickOSSLicense: () -> Unit,
     onClickDeveloper: () -> Unit,
 ) {
@@ -48,7 +49,7 @@ fun SettingView(
                 label = stringResource(R.string.auto_save),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Switch(checked = isAutoSaveEnabled, onCheckedChange = onChangedAutoSaveEnabled)
+                Switch(checked = uiState.isAutoSaveEnabled, onCheckedChange = onChangedAutoSaveEnabled)
             }
         }
         item {
@@ -56,7 +57,7 @@ fun SettingView(
                 label = stringResource(R.string.show_line_number),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Switch(checked = isAutoSaveEnabled, onCheckedChange = onChangedAutoSaveEnabled)
+                Switch(checked = uiState.isShowLineNumberEnabled, onCheckedChange = onChangedShowLineNumber)
             }
         }
         item {
@@ -147,9 +148,13 @@ private fun SettingItem(
 @Composable
 private fun SettingViewPreview() = PreviewContainer {
     SettingView(
-        isAutoSaveEnabled = true,
+        uiState = SettingUiState(
+            isAutoSaveEnabled = true,
+            isShowLineNumberEnabled = true,
+        ),
         onChangedAutoSaveEnabled = {},
         onClickOSSLicense = {},
         onClickDeveloper = {},
+        onChangedShowLineNumber = {},
     )
 }

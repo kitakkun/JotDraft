@@ -12,4 +12,8 @@ class SettingViewModel : ViewModel() {
     fun setAutoSaveEnabled(isEnabled: Boolean) {
         mutableUiState.update { it.copy(isAutoSaveEnabled = isEnabled) }
     }
+
+    fun setShowLineNumber(isEnabled: Boolean) {
+        mutableUiState.update { it.copy(isShowLineNumberEnabled = isEnabled) }
+    }
 }

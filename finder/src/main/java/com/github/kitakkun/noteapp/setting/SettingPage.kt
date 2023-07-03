@@ -14,8 +14,9 @@ fun SettingPage(
     val uiState = viewModel.uiState.collectAsState()
     val uriHandler = LocalUriHandler.current
     SettingView(
-        isAutoSaveEnabled = uiState.value.isAutoSaveEnabled,
+        uiState = uiState.value,
         onChangedAutoSaveEnabled = viewModel::setAutoSaveEnabled,
+        onChangedShowLineNumber = viewModel::setShowLineNumber,
         onClickOSSLicense = { navController.navigate(SubPage.License.route) },
         onClickDeveloper = {
             uriHandler.openUri("https://twitter.com/kitakkun_pb")
