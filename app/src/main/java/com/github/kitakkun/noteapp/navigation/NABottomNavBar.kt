@@ -1,8 +1,8 @@
 package com.github.kitakkun.noteapp.navigation
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notes
 import androidx.compose.material.icons.filled.Settings
@@ -11,8 +11,6 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.tooling.preview.Preview
 import com.github.kitakkun.noteapp.customview.preview.PreviewContainer
 
@@ -25,9 +23,8 @@ fun NABottomNavBar(
     val shouldVisible = currentRoute == MainPage.Finder.route || currentRoute == MainPage.Setting.route
     AnimatedVisibility(
         visible = shouldVisible,
-        enter = slideInVertically(initialOffsetY = { it }),
-        exit = slideOutVertically(targetOffsetY = { it }),
-        modifier = Modifier.clipToBounds(),
+        enter = expandVertically(),
+        exit = shrinkVertically(),
     ) {
         NavigationBar {
             NavigationBarItem(

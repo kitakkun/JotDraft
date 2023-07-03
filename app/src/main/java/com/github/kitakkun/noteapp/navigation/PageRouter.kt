@@ -1,11 +1,12 @@
 package com.github.kitakkun.noteapp.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -45,9 +46,7 @@ fun PageRouter(
         NavHost(
             navController = navController,
             startDestination = MainPage.route,
-            modifier = Modifier
-                .padding(it)
-                .clipToBounds()
+            modifier = Modifier.padding(it)
         ) {
             navigation(route = MainPage.route, startDestination = MainPage.Finder.route) {
                 composable(route = MainPage.Finder.route) {
@@ -70,13 +69,26 @@ fun PageRouter(
                 composable(route = MainPage.Editor.route) {
                     EditorPage(viewModel = koinViewModel { parametersOf(null, navController) })
                 }
-                composable(route = SubPage.License.route) {
+                composable(
+                    route = SubPage.License.route,
+                    enterTransition = {
+                        slideIntoContainer(
+                            towards = AnimatedContentTransitionScope.SlideDirection.Start,
+                            animationSpec = tween(400)
+                        )
+                    },
+                    exitTransition = {
+                        slideOutOfContainer(
+                            towards = AnimatedContentTransitionScope.SlideDirection.End,
+                            animationSpec = tween(400)
+                        )
+                    }
+                ) {
                     LicensePage(
                         navController = navController,
                     )
                 }
             }
         }
-
     }
 }
