@@ -48,7 +48,7 @@ fun DynamicColorCircle(
         drawRect(
             color = if (isDarkTheme) darkThemeColor else lightThemeColor,
             topLeft = Offset(x = 0f, y = 0f),
-            size = size,
+            size = size.copy(width = size.width * 0.65f),
             style = Fill,
         )
         drawRect(
