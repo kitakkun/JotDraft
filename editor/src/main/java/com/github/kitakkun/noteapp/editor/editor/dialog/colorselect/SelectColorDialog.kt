@@ -29,10 +29,12 @@ fun SelectColorDialog(
             modifier = Modifier.background(MaterialTheme.colorScheme.surface),
         ) {
             items(availableColors) {
-                ColorCircle(
-                    color = it,
+                DynamicColorCircle(
+                    lightThemeColor = it,
+                    darkThemeColor = it,
                     isSelected = it == selectedColor,
-                    onClick = { onColorSelected(it) }
+                    onClick = { onColorSelected(it) },
+                    modifier = Modifier.padding(8.dp)
                 )
             }
             item {
