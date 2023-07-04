@@ -7,8 +7,5 @@ data class EditorConfig(
     val baseStyle: BaseStyle = BaseStyle.Body,
     val isBold: Boolean = false,
     val isItalic: Boolean = false,
-    val color: StyleColor = StyleColor.Dynamic(
-        lightValue = androidx.compose.ui.graphics.Color.Black,
-        darkValue = androidx.compose.ui.graphics.Color.White,
-    ),
+    val color: StyleColor = StyleColor.Dynamic.Default,
 )

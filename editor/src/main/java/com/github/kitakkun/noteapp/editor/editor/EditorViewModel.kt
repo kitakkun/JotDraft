@@ -1,6 +1,5 @@
 package com.github.kitakkun.noteapp.editor.editor
 
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
@@ -452,8 +451,7 @@ class EditorViewModel(
             baseStyle = baseStyle ?: editorConfig.baseStyle,
             isBold = activeOverrideAnchors.any { it.style is OverrideStyle.Bold },
             isItalic = activeOverrideAnchors.any { it.style is OverrideStyle.Italic },
-            color = (activeOverrideAnchors.find { it.style is OverrideStyle.Color }?.style as? OverrideStyle.Color)?.color
-                ?: StyleColor.Dynamic(lightValue = Color.Black, darkValue = Color.White),
+            color = (activeOverrideAnchors.find { it.style is OverrideStyle.Color }?.style as? OverrideStyle.Color)?.color ?: editorConfig.color
         )
     }
 

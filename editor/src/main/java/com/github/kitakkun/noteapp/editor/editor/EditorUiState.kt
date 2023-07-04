@@ -27,10 +27,7 @@ data class EditorUiState(
 
     // colors
     val availableColors: List<StyleColor> = listOf(
-        StyleColor.Dynamic(
-            lightValue = Color.Black,
-            darkValue = Color.White,
-        ),
+        StyleColor.Dynamic.Default,
         Color.Black.static,
         Color.Red.static,
         Color.Green.static,

@@ -6,7 +6,14 @@ sealed interface StyleColor {
     data class Dynamic(
         val lightValue: Color,
         val darkValue: Color,
-    ) : StyleColor
+    ) : StyleColor {
+        companion object {
+            val Default = Dynamic(
+                lightValue = Color.Black,
+                darkValue = Color.White
+            )
+        }
+    }
 
     data class Static(
         val value: Color,
