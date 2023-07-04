@@ -48,7 +48,7 @@ fun SelectColorDialog(
                         onClick = { onColorSelected(color) },
                     )
 
-                    is StyleColor.Static -> ColorCircle(
+                    is StyleColor.Static -> StaticColorCircle(
                         color = color.value,
                         isSelected = color == selectedColor,
                         onClick = { onColorSelected(color) },

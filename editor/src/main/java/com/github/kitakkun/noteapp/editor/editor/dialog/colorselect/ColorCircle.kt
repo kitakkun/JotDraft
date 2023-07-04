@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.github.kitakkun.noteapp.customview.preview.PreviewContainer
 
 @Composable
-fun ColorCircle(
+fun StaticColorCircle(
     color: Color,
     isSelected: Boolean,
     onClick: () -> Unit,
@@ -45,8 +45,8 @@ fun ColorCircle(
 
 @Preview
 @Composable
-private fun ColorCirclePreview() = PreviewContainer {
-    ColorCircle(
+private fun StaticColorCirclePreview() = PreviewContainer {
+    StaticColorCircle(
         color = Color.Red,
         isSelected = true,
         onClick = {},
