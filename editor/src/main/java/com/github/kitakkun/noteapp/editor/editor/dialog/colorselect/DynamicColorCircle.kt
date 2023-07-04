@@ -3,7 +3,8 @@ package com.github.kitakkun.noteapp.editor.editor.dialog.colorselect
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -19,20 +20,28 @@ import com.github.kitakkun.noteapp.customview.preview.PreviewContainer
 
 @Composable
 fun DynamicColorCircle(
-    isDarkTheme: Boolean,
     lightThemeColor: Color,
     darkThemeColor: Color,
+    isSelected: Boolean,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    isDarkTheme: Boolean = isSystemInDarkTheme(),
 ) {
     Canvas(
-        modifier = Modifier
-            .size(100.dp)
+        modifier = modifier
+            .aspectRatio(1f)
             .rotate(30f)
             .clip(CircleShape)
             .clickable(onClick = onClick)
             .border(
-                color= MaterialTheme.colorScheme.onBackground,
-                width = 1.dp,
+                color = when (isSelected) {
+                    true -> MaterialTheme.colorScheme.primary
+                    false -> MaterialTheme.colorScheme.onBackground
+                },
+                width = when (isSelected) {
+                    true -> 3.dp
+                    false -> 1.dp
+                },
                 shape = CircleShape,
             )
     ) {
@@ -59,6 +68,7 @@ private fun DynamicColorCirclePreview() = PreviewContainer {
         isDarkTheme = false,
         lightThemeColor = Color.Black,
         darkThemeColor = Color.White,
+        isSelected = true,
         onClick = {},
     )
 }
