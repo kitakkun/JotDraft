@@ -23,7 +23,7 @@ fun AddColorCircle(
     modifier: Modifier = Modifier,
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .aspectRatio(1f)
             .clip(CircleShape)
             .background(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
