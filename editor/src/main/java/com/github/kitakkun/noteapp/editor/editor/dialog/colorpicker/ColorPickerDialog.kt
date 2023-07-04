@@ -57,6 +57,7 @@ fun ColorPickerDialog(
     val controller = rememberColorPickerController()
     var hexCode by remember { mutableStateOf("") }
     var textColor by remember { mutableStateOf(Color.Transparent) }
+    var useDynamicColor by remember { mutableStateOf(false) }
     Dialog(onDismissRequest = onDismiss) {
         Column(
             modifier = Modifier
@@ -64,9 +65,8 @@ fun ColorPickerDialog(
                 .scrollable(
                     state = rememberScrollState(),
                     orientation = Orientation.Vertical
-                )
+                ),
         ) {
-            Switch(checked = true, onCheckedChange = {})
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
@@ -81,6 +81,14 @@ fun ColorPickerDialog(
                     Spacer(modifier = Modifier.width(4.dp))
                     Icon(imageVector = Icons.Default.Check, contentDescription = null)
                 }
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                Text(text = "Use Dynamic Color")
+                Spacer(modifier = Modifier.weight(1f))
+                Switch(checked = useDynamicColor, onCheckedChange = { useDynamicColor = it })
             }
             Text(
                 text = "#$hexCode",
