@@ -33,9 +33,9 @@ fun SelectColorDialog(
                     color = MaterialTheme.colorScheme.surface,
                     shape = MaterialTheme.shapes.medium,
                 )
-                .padding(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+                .padding(14.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             items(availableColors) {
                 DynamicColorCircle(
