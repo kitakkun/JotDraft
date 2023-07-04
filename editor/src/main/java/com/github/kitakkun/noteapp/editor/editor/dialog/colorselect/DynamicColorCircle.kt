@@ -53,7 +53,7 @@ fun DynamicColorCircle(
         )
         drawRect(
             color = if (isDarkTheme) lightThemeColor else darkThemeColor,
-            topLeft = Offset(x = size.width * 0.60f, y = 0f),
+            topLeft = Offset(x = size.width * 0.65f, y = 0f),
             size = size,
             style = Fill,
         )
