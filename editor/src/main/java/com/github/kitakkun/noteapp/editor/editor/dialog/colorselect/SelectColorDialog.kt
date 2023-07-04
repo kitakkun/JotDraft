@@ -29,7 +29,10 @@ fun SelectColorDialog(
         LazyVerticalGrid(
             columns = GridCells.Adaptive(64.dp),
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.surface)
+                .background(
+                    color = MaterialTheme.colorScheme.surface,
+                    shape = MaterialTheme.shapes.medium,
+                )
                 .padding(8.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
