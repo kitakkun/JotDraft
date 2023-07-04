@@ -26,7 +26,20 @@ sealed interface OverrideStyle {
         override val spanStyle = SpanStyle(fontSize = fontSize)
     }
 
-    data class Color(val color: androidx.compose.ui.graphics.Color) : OverrideStyle {
-        override val spanStyle = SpanStyle(color = color)
+    data class Color(
+        val color: StyleColor,
+    ) : OverrideStyle {
+        override val spanStyle = SpanStyle(
+            color = when (color) {
+                is StyleColor.Dynamic -> color.lightValue
+                is StyleColor.Static -> color.value
+            }
+        )
+        val darkThemeSpanStyle = SpanStyle(
+            color = when (color) {
+                is StyleColor.Dynamic -> color.darkValue
+                is StyleColor.Static -> color.value
+            }
+        )
     }
 }

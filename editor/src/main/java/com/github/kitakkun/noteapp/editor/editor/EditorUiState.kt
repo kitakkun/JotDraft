@@ -4,6 +4,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import com.github.kitakkun.noteapp.data.model.BaseStyleAnchor
 import com.github.kitakkun.noteapp.data.model.OverrideStyleAnchor
+import com.github.kitakkun.noteapp.data.model.StyleColor
+import com.github.kitakkun.noteapp.data.model.static
 import com.github.kitakkun.noteapp.editor.editor.editmodel.EditorConfig
 
 data class EditorUiState(
@@ -24,10 +26,18 @@ data class EditorUiState(
     val showColorPickerDialog: Boolean = false,
 
     // colors
-    val availableColors: List<Color> = listOf(
-        Color.Black,
-        Color.Red, Color.Green, Color.Blue,
-        Color.Yellow, Color.Magenta, Color.Cyan,
+    val availableColors: List<StyleColor> = listOf(
+        StyleColor.Dynamic(
+            lightValue = Color.Black,
+            darkValue = Color.White,
+        ),
+        Color.Black.static,
+        Color.Red.static,
+        Color.Green.static,
+        Color.Blue.static,
+        Color.Yellow.static,
+        Color.Magenta.static,
+        Color.Cyan.static,
     ),
 
     val canUndo: Boolean = false,

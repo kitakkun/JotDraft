@@ -21,6 +21,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,6 +39,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.github.kitakkun.noteapp.customview.preview.PreviewContainer
+import com.github.kitakkun.noteapp.data.model.StyleColor
+import com.github.kitakkun.noteapp.data.model.static
 import com.github.kitakkun.noteapp.editor.R
 import com.github.skydoves.colorpicker.compose.AlphaSlider
 import com.github.skydoves.colorpicker.compose.AlphaTile
@@ -49,7 +52,7 @@ import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 fun ColorPickerDialog(
     onDismiss: () -> Unit,
     onCancel: () -> Unit,
-    onColorConfirm: (Color) -> Unit,
+    onColorConfirm: (StyleColor) -> Unit,
 ) {
     val controller = rememberColorPickerController()
     var hexCode by remember { mutableStateOf("") }
@@ -63,6 +66,7 @@ fun ColorPickerDialog(
                     orientation = Orientation.Vertical
                 )
         ) {
+            Switch(checked = true, onCheckedChange = {})
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
@@ -72,7 +76,7 @@ fun ColorPickerDialog(
                 IconButton(onClick = onCancel) {
                     Icon(imageVector = Icons.Default.Close, contentDescription = null)
                 }
-                Button(onClick = { onColorConfirm(controller.selectedColor.value) }) {
+                Button(onClick = { onColorConfirm(controller.selectedColor.value.static) }) {
                     Text(text = stringResource(R.string.ok))
                     Spacer(modifier = Modifier.width(4.dp))
                     Icon(imageVector = Icons.Default.Check, contentDescription = null)
