@@ -4,9 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,23 +23,21 @@ fun StaticColorCircle(
 ) {
     Box(
         modifier = Modifier
-            .size(64.dp)
-            .padding(4.dp)
-            .background(
-                color = color,
-                shape = CircleShape
-            )
+            .aspectRatio(1f)
+            .clip(CircleShape)
+            .clickable(onClick = onClick)
+            .background(color = color)
             .border(
-                width = 2.dp,
-                color = if (isSelected) Color.Black else Color.White,
+                width = when (isSelected) {
+                    true -> 3.dp
+                    else -> 1.dp
+                },
+                color = when (isSelected) {
+                    true -> MaterialTheme.colorScheme.primary
+                    false -> MaterialTheme.colorScheme.onBackground
+                },
                 shape = CircleShape
             )
-            .clip(
-                CircleShape
-            )
-            .clickable {
-                onClick()
-            }
     )
 }
 
