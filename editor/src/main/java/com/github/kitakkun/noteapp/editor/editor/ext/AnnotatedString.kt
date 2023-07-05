@@ -3,11 +3,14 @@ package com.github.kitakkun.noteapp.editor.editor.ext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import com.github.kitakkun.noteapp.data.model.BaseStyleAnchor
+import com.github.kitakkun.noteapp.data.model.OverrideStyle
 import com.github.kitakkun.noteapp.data.model.OverrideStyleAnchor
+import com.github.kitakkun.noteapp.data.model.StyleColor
 
 fun AnnotatedString.applyStyles(
     baseStyleAnchors: List<BaseStyleAnchor>,
     overrideStyleAnchors: List<OverrideStyleAnchor>,
+    isDarkTheme: Boolean,
 ) = buildAnnotatedString {
     append(text = text)
     /**
@@ -38,11 +41,36 @@ fun AnnotatedString.applyStyles(
             end = end,
         )
     }
-    overrideStyleAnchors.forEach {
-        addStyle(
-            style = it.style.spanStyle,
-            start = it.start,
-            end = it.end
-        )
+    overrideStyleAnchors.forEach { anchor ->
+        if (anchor.style !is OverrideStyle.Color) {
+            addStyle(
+                style = anchor.style.spanStyle,
+                start = anchor.start,
+                end = anchor.end
+            )
+            return@forEach
+        }
+        val style = anchor.style as OverrideStyle.Color
+        when (style.color) {
+            is StyleColor.Dynamic -> {
+                addStyle(
+                    style = if (isDarkTheme) {
+                        style.darkThemeSpanStyle
+                    } else {
+                        style.spanStyle
+                    },
+                    start = anchor.start,
+                    end = anchor.end
+                )
+            }
+
+            is StyleColor.Static -> {
+                addStyle(
+                    style = style.spanStyle,
+                    start = anchor.start,
+                    end = anchor.end
+                )
+            }
+        }
     }
 }

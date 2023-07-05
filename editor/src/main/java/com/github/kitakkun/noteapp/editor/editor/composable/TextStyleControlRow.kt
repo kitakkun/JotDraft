@@ -2,6 +2,7 @@ package com.github.kitakkun.noteapp.editor.editor.composable
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,12 +27,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.kitakkun.noteapp.customview.preview.PreviewContainer
+import com.github.kitakkun.noteapp.data.model.StyleColor
 import com.github.kitakkun.noteapp.editor.editor.editmodel.EditorConfig
 
 @Composable
 fun TextStyleControlRow(
     config: EditorConfig,
-    color: Color,
+    color: StyleColor,
     onBoldChange: (Boolean) -> Unit,
     onItalicChange: (Boolean) -> Unit,
     onTextColorIconClick: () -> Unit,
@@ -64,7 +66,10 @@ fun TextStyleControlRow(
             Icon(
                 imageVector = Icons.Filled.FormatColorText,
                 contentDescription = null,
-                tint = color,
+                tint = when (color) {
+                    is StyleColor.Dynamic -> if (isSystemInDarkTheme()) color.darkValue else color.lightValue
+                    is StyleColor.Static -> color.value
+                }
             )
         }
         IconToggleButton(checked = config.isBold, onCheckedChange = onBoldChange) {
@@ -80,7 +85,7 @@ fun TextStyleControlRow(
 @Composable
 private fun TextStyleControlRowPreview() = PreviewContainer {
     TextStyleControlRow(
-        color = Color.Red,
+        color = StyleColor.Dynamic(Color.Black, Color.White),
         config = EditorConfig(),
         onBoldChange = {},
         onBaseTextFormatClick = {},

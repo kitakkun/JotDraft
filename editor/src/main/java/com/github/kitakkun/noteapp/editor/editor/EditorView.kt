@@ -1,17 +1,18 @@
 package com.github.kitakkun.noteapp.editor.editor
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.tooling.preview.Preview
 import com.github.kitakkun.noteapp.customview.preview.PreviewContainer
 import com.github.kitakkun.noteapp.data.model.BaseStyle
+import com.github.kitakkun.noteapp.data.model.StyleColor
 import com.github.kitakkun.noteapp.editor.editor.composable.EditorTextField
 import com.github.kitakkun.noteapp.editor.editor.composable.EditorTopBar
 import com.github.kitakkun.noteapp.editor.editor.composable.TextStyleControlRow
@@ -35,9 +36,9 @@ fun EditorView(
     onDismissSelectBaseDocumentTextStyleDialog: () -> Unit,
     onDismissColorPickerDialog: () -> Unit,
     onDismissSelectColorDialog: () -> Unit,
-    onAddColorFinished: (Color) -> Unit,
+    onAddColorFinished: (StyleColor) -> Unit,
     onColorPickerOpenRequest: () -> Unit,
-    onColorSelected: (Color) -> Unit,
+    onColorSelected: (StyleColor) -> Unit,
     onClickRedo: () -> Unit,
     onClickUndo: () -> Unit,
 ) {
@@ -65,6 +66,8 @@ fun EditorView(
         )
     }
 
+    val isDarkTheme = isSystemInDarkTheme()
+
     Scaffold(
         topBar = {
             EditorTopBar(
@@ -91,7 +94,8 @@ fun EditorView(
                     TransformedText(
                         text = it.applyStyles(
                             baseStyleAnchors = uiState.baseStyleAnchors,
-                            overrideStyleAnchors = uiState.overrideStyleAnchors
+                            overrideStyleAnchors = uiState.overrideStyleAnchors,
+                            isDarkTheme = isDarkTheme,
                         ),
                         offsetMapping = OffsetMapping.Identity,
                     )

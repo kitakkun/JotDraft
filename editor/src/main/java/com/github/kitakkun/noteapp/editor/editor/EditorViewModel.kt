@@ -1,6 +1,5 @@
 package com.github.kitakkun.noteapp.editor.editor
 
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
@@ -10,6 +9,7 @@ import com.github.kitakkun.noteapp.data.model.BaseStyle
 import com.github.kitakkun.noteapp.data.model.BaseStyleAnchor
 import com.github.kitakkun.noteapp.data.model.OverrideStyle
 import com.github.kitakkun.noteapp.data.model.OverrideStyleAnchor
+import com.github.kitakkun.noteapp.data.model.StyleColor
 import com.github.kitakkun.noteapp.data.repository.DocumentRepository
 import com.github.kitakkun.noteapp.data.room.DocumentEntity
 import com.github.kitakkun.noteapp.data.store.SettingDataStore
@@ -257,11 +257,11 @@ class EditorViewModel(
         }
     }
 
-    fun addColor(color: Color) {
+    fun addColor(color: StyleColor) {
         mutableUiState.update { it.copy(availableColors = it.availableColors + color) }
     }
 
-    fun updateCurrentColor(color: Color) {
+    fun updateCurrentColor(color: StyleColor) {
         if (!uiState.value.content.selection.collapsed) {
             viewModelScope.launch {
                 saveHistoryFlow.emit(
@@ -275,7 +275,9 @@ class EditorViewModel(
         }
         mutableUiState.update { uiState ->
             uiState.copy(
-                editorConfig = uiState.editorConfig.copy(color = color),
+                editorConfig = uiState.editorConfig.copy(
+                    color = color,
+                ),
                 overrideStyleAnchors = toggleOverrideStyleOfSelection(
                     selection = uiState.content.selection,
                     overrideStyle = OverrideStyle.Color(color),
@@ -425,15 +427,13 @@ class EditorViewModel(
                 )
             )
         }
-        if (editorConfig.color != Color.Unspecified) {
-            anchorsToInsert.add(
-                OverrideStyleAnchor(
-                    start = insertPos,
-                    end = insertPos + length,
-                    style = OverrideStyle.Color(editorConfig.color),
-                )
+        anchorsToInsert.add(
+            OverrideStyleAnchor(
+                start = insertPos,
+                end = insertPos + length,
+                style = OverrideStyle.Color(editorConfig.color),
             )
-        }
+        )
         return anchorsToInsert
     }
 
@@ -451,9 +451,7 @@ class EditorViewModel(
             baseStyle = baseStyle ?: editorConfig.baseStyle,
             isBold = activeOverrideAnchors.any { it.style is OverrideStyle.Bold },
             isItalic = activeOverrideAnchors.any { it.style is OverrideStyle.Italic },
-            color = activeOverrideAnchors.find { it.style is OverrideStyle.Color }
-                ?.style?.spanStyle?.color
-                ?: editorConfig.color
+            color = (activeOverrideAnchors.find { it.style is OverrideStyle.Color }?.style as? OverrideStyle.Color)?.color ?: editorConfig.color
         )
     }
 

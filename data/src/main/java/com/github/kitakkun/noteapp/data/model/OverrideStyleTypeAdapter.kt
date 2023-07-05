@@ -31,8 +31,22 @@ class OverrideStyleTypeAdapter :
             }
 
             is OverrideStyle.Color -> {
-                out.name("type").value("color")
-                out.name("params").beginArray().value(value.color.toArgb().toString()).endArray()
+                when (value.color) {
+                    is StyleColor.Static -> {
+                        out.name("type").value("color")
+                        out.name("params").beginArray()
+                            .value(value.color.value.toArgb().toString())
+                            .endArray()
+                    }
+
+                    is StyleColor.Dynamic -> {
+                        out.name("type").value("dynamicColor")
+                        out.name("params").beginArray()
+                            .value(value.color.lightValue.toArgb().toString())
+                            .value(value.color.darkValue.toArgb().toString())
+                            .endArray()
+                    }
+                }
             }
         }
         out.endObject()
@@ -62,8 +76,21 @@ class OverrideStyleTypeAdapter :
             "italic" -> OverrideStyle.Italic(params[0].toBoolean())
             "fontSize" -> OverrideStyle.FontSize(params[0].toDouble().sp)
             "color" -> OverrideStyle.Color(
-                androidx.compose.ui.graphics.Color(
-                    params[0].toInt()
+                StyleColor.Static(
+                    androidx.compose.ui.graphics.Color(
+                        params[0].toInt()
+                    )
+                )
+            )
+
+            "dynamicColor" -> OverrideStyle.Color(
+                StyleColor.Dynamic(
+                    lightValue = androidx.compose.ui.graphics.Color(
+                        params[0].toInt()
+                    ),
+                    darkValue = androidx.compose.ui.graphics.Color(
+                        params[1].toInt()
+                    )
                 )
             )
 
