@@ -1,7 +1,7 @@
-package com.github.kitakkun.noteapp.editor.editor.editmodel
+package com.github.kitakkun.noteapp.editor.editmodel
 
 import androidx.compose.ui.text.input.TextFieldValue
-import com.github.kitakkun.noteapp.editor.editor.ext.toValidOrder
+import com.github.kitakkun.noteapp.editor.ext.toValidOrder
 
 sealed interface TextFieldChangeEvent {
     val oldValue: TextFieldValue

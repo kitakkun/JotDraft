@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.editor.editor.ext
+package com.github.kitakkun.noteapp.editor.ext
 
 import com.github.kitakkun.noteapp.data.model.BaseStyle
 import com.github.kitakkun.noteapp.data.model.BaseStyleAnchor

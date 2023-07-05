@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.editor.editor
+package com.github.kitakkun.noteapp.editor
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
@@ -6,7 +6,7 @@ import com.github.kitakkun.noteapp.data.model.BaseStyleAnchor
 import com.github.kitakkun.noteapp.data.model.OverrideStyleAnchor
 import com.github.kitakkun.noteapp.data.model.StyleColor
 import com.github.kitakkun.noteapp.data.model.static
-import com.github.kitakkun.noteapp.editor.editor.editmodel.EditorConfig
+import com.github.kitakkun.noteapp.editor.editmodel.EditorConfig
 
 data class EditorUiState(
     // document raw data

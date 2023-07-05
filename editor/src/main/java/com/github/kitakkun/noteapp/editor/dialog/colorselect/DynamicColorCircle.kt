@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.editor.editor.dialog.colorselect
+package com.github.kitakkun.noteapp.editor.dialog.colorselect
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.Canvas

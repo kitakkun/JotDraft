@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.editor.editor
+package com.github.kitakkun.noteapp.editor
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect

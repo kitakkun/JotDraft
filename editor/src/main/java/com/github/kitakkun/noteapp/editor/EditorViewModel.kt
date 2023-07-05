@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.editor.editor
+package com.github.kitakkun.noteapp.editor
 
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
@@ -13,16 +13,16 @@ import com.github.kitakkun.noteapp.data.model.StyleColor
 import com.github.kitakkun.noteapp.data.repository.DocumentRepository
 import com.github.kitakkun.noteapp.data.room.DocumentEntity
 import com.github.kitakkun.noteapp.data.store.SettingDataStore
-import com.github.kitakkun.noteapp.editor.editor.editmodel.EditHistory
-import com.github.kitakkun.noteapp.editor.editor.editmodel.EditorConfig
-import com.github.kitakkun.noteapp.editor.editor.editmodel.TextFieldChangeEvent
-import com.github.kitakkun.noteapp.editor.editor.ext.deleteLinesAndShiftUp
-import com.github.kitakkun.noteapp.editor.editor.ext.insertNewAnchorsAndShiftDown
-import com.github.kitakkun.noteapp.editor.editor.ext.optimize
-import com.github.kitakkun.noteapp.editor.editor.ext.shiftToLeft
-import com.github.kitakkun.noteapp.editor.editor.ext.shiftToRight
-import com.github.kitakkun.noteapp.editor.editor.ext.splitAt
-import com.github.kitakkun.noteapp.editor.editor.ext.toValidOrder
+import com.github.kitakkun.noteapp.editor.editmodel.EditHistory
+import com.github.kitakkun.noteapp.editor.editmodel.EditorConfig
+import com.github.kitakkun.noteapp.editor.editmodel.TextFieldChangeEvent
+import com.github.kitakkun.noteapp.editor.ext.deleteLinesAndShiftUp
+import com.github.kitakkun.noteapp.editor.ext.insertNewAnchorsAndShiftDown
+import com.github.kitakkun.noteapp.editor.ext.optimize
+import com.github.kitakkun.noteapp.editor.ext.shiftToLeft
+import com.github.kitakkun.noteapp.editor.ext.shiftToRight
+import com.github.kitakkun.noteapp.editor.ext.splitAt
+import com.github.kitakkun.noteapp.editor.ext.toValidOrder
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -37,7 +37,7 @@ class EditorViewModel(
     private val documentRepository: DocumentRepository,
     private val settingDataStore: SettingDataStore,
     private val navController: NavController,
-    private val historyManager: EditHistoryManager,
+    private val historyManager: com.github.kitakkun.noteapp.editor.EditHistoryManager,
 ) : ViewModel() {
     companion object {
         private const val TAG = "EditorViewModel"
