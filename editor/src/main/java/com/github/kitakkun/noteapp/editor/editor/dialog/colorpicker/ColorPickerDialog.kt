@@ -181,10 +181,10 @@ fun ColorPickerDialog(
 @Composable
 private fun ColorTile(
     color: Color,
-    label: String? = null,
     onClick: () -> Unit,
     isSelected: Boolean,
     modifier: Modifier = Modifier,
+    label: String? = null,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
