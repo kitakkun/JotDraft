@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.editor.editor.composable
+package com.github.kitakkun.noteapp.editor.composable
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.BasicTextField

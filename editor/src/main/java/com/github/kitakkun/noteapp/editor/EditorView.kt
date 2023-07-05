@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.editor.editor
+package com.github.kitakkun.noteapp.editor
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
@@ -13,13 +13,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.github.kitakkun.noteapp.customview.preview.PreviewContainer
 import com.github.kitakkun.noteapp.data.model.BaseStyle
 import com.github.kitakkun.noteapp.data.model.StyleColor
-import com.github.kitakkun.noteapp.editor.editor.composable.EditorTextField
-import com.github.kitakkun.noteapp.editor.editor.composable.EditorTopBar
-import com.github.kitakkun.noteapp.editor.editor.composable.TextStyleControlRow
-import com.github.kitakkun.noteapp.editor.editor.dialog.colorpicker.ColorPickerDialog
-import com.github.kitakkun.noteapp.editor.editor.dialog.colorselect.SelectColorDialog
-import com.github.kitakkun.noteapp.editor.editor.dialog.selectbasedocument.SelectBaseStyleDialog
-import com.github.kitakkun.noteapp.editor.editor.ext.applyStyles
+import com.github.kitakkun.noteapp.editor.composable.EditorTextField
+import com.github.kitakkun.noteapp.editor.composable.EditorTopBar
+import com.github.kitakkun.noteapp.editor.composable.TextStyleControlRow
+import com.github.kitakkun.noteapp.editor.dialog.colorpicker.ColorPickerDialog
+import com.github.kitakkun.noteapp.editor.dialog.colorselect.SelectColorDialog
+import com.github.kitakkun.noteapp.editor.dialog.selectbasedocument.SelectBaseStyleDialog
+import com.github.kitakkun.noteapp.editor.ext.applyStyles
 
 @Composable
 fun EditorView(

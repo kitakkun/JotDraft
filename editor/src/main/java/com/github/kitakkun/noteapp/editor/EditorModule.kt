@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.editor.editor
+package com.github.kitakkun.noteapp.editor
 
 import androidx.navigation.NavController
 import org.koin.androidx.viewmodel.dsl.viewModel

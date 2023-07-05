@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.editor.editor.editmodel
+package com.github.kitakkun.noteapp.editor.editmodel
 
 import com.github.kitakkun.noteapp.data.model.BaseStyle
 import com.github.kitakkun.noteapp.data.model.StyleColor

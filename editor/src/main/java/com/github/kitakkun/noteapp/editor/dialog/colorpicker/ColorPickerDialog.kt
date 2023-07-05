@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.editor.editor.dialog.colorpicker
+package com.github.kitakkun.noteapp.editor.dialog.colorpicker
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -48,7 +48,7 @@ import androidx.compose.ui.window.Dialog
 import com.github.kitakkun.noteapp.customview.preview.PreviewContainer
 import com.github.kitakkun.noteapp.data.model.StyleColor
 import com.github.kitakkun.noteapp.editor.R
-import com.github.kitakkun.noteapp.editor.editor.ext.toHexCode
+import com.github.kitakkun.noteapp.editor.ext.toHexCode
 import com.github.skydoves.colorpicker.compose.AlphaSlider
 import com.github.skydoves.colorpicker.compose.AlphaTile
 import com.github.skydoves.colorpicker.compose.BrightnessSlider

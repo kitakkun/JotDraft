@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.editor.editor.composable
+package com.github.kitakkun.noteapp.editor.composable
 
 import android.graphics.Paint
 import android.util.Range

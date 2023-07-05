@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.editor.editor.composable
+package com.github.kitakkun.noteapp.editor.composable
 
 import androidx.compose.ui.graphics.Color
 import com.github.kitakkun.noteapp.data.model.BaseStyle

@@ -1,6 +1,6 @@
-package com.github.kitakkun.noteapp.editor.editor
+package com.github.kitakkun.noteapp.editor
 
-import com.github.kitakkun.noteapp.editor.editor.editmodel.EditHistory
+import com.github.kitakkun.noteapp.editor.editmodel.EditHistory
 import java.util.Stack
 
 class EditHistoryManager {

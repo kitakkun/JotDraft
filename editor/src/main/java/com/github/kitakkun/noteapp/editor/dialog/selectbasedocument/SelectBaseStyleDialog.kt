@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.editor.editor.dialog.selectbasedocument
+package com.github.kitakkun.noteapp.editor.dialog.selectbasedocument
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row

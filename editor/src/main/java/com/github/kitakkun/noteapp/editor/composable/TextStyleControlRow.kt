@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.editor.editor.composable
+package com.github.kitakkun.noteapp.editor.composable
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -28,7 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.kitakkun.noteapp.customview.preview.PreviewContainer
 import com.github.kitakkun.noteapp.data.model.StyleColor
-import com.github.kitakkun.noteapp.editor.editor.editmodel.EditorConfig
+import com.github.kitakkun.noteapp.editor.editmodel.EditorConfig
 
 @Composable
 fun TextStyleControlRow(

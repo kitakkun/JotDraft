@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.editor.editor.dialog.colorselect
+package com.github.kitakkun.noteapp.editor.dialog.colorselect
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

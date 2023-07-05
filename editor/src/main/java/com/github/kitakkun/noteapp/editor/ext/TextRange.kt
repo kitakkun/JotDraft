@@ -1,4 +1,4 @@
-package com.github.kitakkun.noteapp.editor.editor.ext
+package com.github.kitakkun.noteapp.editor.ext
 
 import androidx.compose.ui.text.TextRange
 
