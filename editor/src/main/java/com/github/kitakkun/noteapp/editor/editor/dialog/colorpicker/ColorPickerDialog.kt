@@ -3,8 +3,6 @@ package com.github.kitakkun.noteapp.editor.editor.dialog.colorpicker
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -74,17 +73,16 @@ fun ColorPickerDialog(
     Dialog(onDismissRequest = onDismiss) {
         Column(
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.surface)
-                .scrollable(
-                    state = rememberScrollState(),
-                    orientation = Orientation.Vertical
-                ),
+                .background(
+                    color = MaterialTheme.colorScheme.background,
+                    shape = MaterialTheme.shapes.large,
+                )
+                .padding(8.dp)
+                .verticalScroll(rememberScrollState()),
         ) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp),
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 IconButton(onClick = onCancel) {
                     Icon(imageVector = Icons.Default.Close, contentDescription = null)
@@ -107,14 +105,15 @@ fun ColorPickerDialog(
                     Icon(imageVector = Icons.Default.Check, contentDescription = null)
                 }
             }
+            Spacer(modifier = Modifier.height(8.dp))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 Text(text = "Use Dynamic Color")
                 Spacer(modifier = Modifier.weight(1f))
                 Switch(checked = useDynamicColor, onCheckedChange = { useDynamicColor = it })
             }
+            Spacer(modifier = Modifier.height(8.dp))
             if (useDynamicColor) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -146,8 +145,7 @@ fun ColorPickerDialog(
             HsvColorPicker(
                 modifier = Modifier
                     .aspectRatio(1f)
-                    .fillMaxWidth()
-                    .padding(16.dp),
+                    .fillMaxWidth(),
                 controller = controller,
                 onColorChanged = { colorEnvelope ->
                     if (!useDynamicColor) {
@@ -161,17 +159,17 @@ fun ColorPickerDialog(
                     }
                 }
             )
+            Spacer(modifier = Modifier.height(16.dp))
             AlphaSlider(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(10.dp)
                     .height(35.dp),
                 controller = controller,
             )
+            Spacer(modifier = Modifier.height(8.dp))
             BrightnessSlider(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(10.dp)
                     .height(35.dp),
                 controller = controller,
             )
