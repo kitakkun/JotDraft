@@ -109,7 +109,7 @@ fun ColorPickerDialog(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(text = "Use Dynamic Color")
+                Text(text = stringResource(R.string.use_dynamic_color))
                 Spacer(modifier = Modifier.weight(1f))
                 Switch(checked = useDynamicColor, onCheckedChange = { useDynamicColor = it })
             }
@@ -122,13 +122,13 @@ fun ColorPickerDialog(
                 ) {
                     ColorTile(
                         color = lightThemeColor,
-                        label = "Light Theme",
+                        label = stringResource(R.string.light_theme),
                         onClick = { isConfiguringLightThemeColor = true },
                         isSelected = isConfiguringLightThemeColor,
                     )
                     ColorTile(
                         color = darkThemeColor,
-                        label = "Dark Theme",
+                        label = stringResource(R.string.dark_theme),
                         onClick = { isConfiguringLightThemeColor = false },
                         isSelected = !isConfiguringLightThemeColor,
                     )
