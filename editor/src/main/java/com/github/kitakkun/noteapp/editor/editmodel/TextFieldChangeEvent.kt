@@ -70,8 +70,8 @@ sealed interface TextFieldChangeEvent {
                             endIndex = oldSelection.end,
                         ),
                         insertedText = new.text.substring(
-                            startIndex = newSelection.start,
-                            endIndex = newSelection.end,
+                            startIndex = oldSelection.start,
+                            endIndex = newSelection.start,
                         ),
                         oldValue = old,
                         newValue = new,
