@@ -15,6 +15,8 @@ import com.github.kitakkun.noteapp.data.store.SettingDataStore
 import com.github.kitakkun.noteapp.editor.editmodel.EditHistory
 import com.github.kitakkun.noteapp.editor.editmodel.EditorConfig
 import com.github.kitakkun.noteapp.editor.editmodel.TextFieldChangeEvent
+import com.github.kitakkun.noteapp.editor.ext.getLineAtEndCursor
+import com.github.kitakkun.noteapp.editor.ext.getLineAtStartCursor
 import com.github.kitakkun.noteapp.editor.usecase.AnchorTransformer
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -328,20 +330,6 @@ class EditorViewModel(
             isItalic = activeOverrideAnchors.any { it.style is OverrideStyle.Italic },
             color = (activeOverrideAnchors.find { it.style is OverrideStyle.Color }?.style as? OverrideStyle.Color)?.color ?: editorConfig.color
         )
-    }
-
-    private fun TextFieldValue.getLineAtStartCursor(): Int {
-        val cursorPosition = this.selection.start
-        if (cursorPosition == 0) return 0
-        val textBeforeCursor = this.text.substring(0, cursorPosition)
-        return textBeforeCursor.count { it == '\n' }
-    }
-
-    private fun TextFieldValue.getLineAtEndCursor(): Int {
-        val cursorPosition = this.selection.end
-        if (cursorPosition == 0) return 0
-        val textBeforeCursor = this.text.substring(0, cursorPosition)
-        return textBeforeCursor.count { it == '\n' }
     }
 
     fun redo() {
