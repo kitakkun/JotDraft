@@ -30,7 +30,7 @@ class EditorViewModel(
     private val documentRepository: DocumentRepository,
     private val settingDataStore: SettingDataStore,
     private val navController: NavController,
-    private val historyManager: com.github.kitakkun.noteapp.editor.EditHistoryManager,
+    private val historyManager: EditHistoryManager,
     private val anchorTransformer: AnchorTransformer,
 ) : ViewModel() {
     companion object {
