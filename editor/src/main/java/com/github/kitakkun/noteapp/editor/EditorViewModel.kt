@@ -1,6 +1,5 @@
 package com.github.kitakkun.noteapp.editor
 
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,13 +15,9 @@ import com.github.kitakkun.noteapp.data.store.SettingDataStore
 import com.github.kitakkun.noteapp.editor.editmodel.EditHistory
 import com.github.kitakkun.noteapp.editor.editmodel.EditorConfig
 import com.github.kitakkun.noteapp.editor.editmodel.TextFieldChangeEvent
-import com.github.kitakkun.noteapp.editor.ext.deleteLinesAndShiftUp
-import com.github.kitakkun.noteapp.editor.ext.insertNewAnchorsAndShiftDown
-import com.github.kitakkun.noteapp.editor.ext.optimize
-import com.github.kitakkun.noteapp.editor.ext.shiftToLeft
-import com.github.kitakkun.noteapp.editor.ext.shiftToRight
-import com.github.kitakkun.noteapp.editor.ext.splitAt
-import com.github.kitakkun.noteapp.editor.ext.toValidOrder
+import com.github.kitakkun.noteapp.editor.ext.getLineAtEndCursor
+import com.github.kitakkun.noteapp.editor.ext.getLineAtStartCursor
+import com.github.kitakkun.noteapp.editor.usecase.AnchorTransformer
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -37,7 +32,8 @@ class EditorViewModel(
     private val documentRepository: DocumentRepository,
     private val settingDataStore: SettingDataStore,
     private val navController: NavController,
-    private val historyManager: com.github.kitakkun.noteapp.editor.EditHistoryManager,
+    private val historyManager: EditHistoryManager,
+    private val anchorTransformer: AnchorTransformer,
 ) : ViewModel() {
     companion object {
         private const val TAG = "EditorViewModel"
@@ -152,13 +148,13 @@ class EditorViewModel(
             new = newTextFieldValue,
         )
 
-        val newOverrideAnchors = updateOverrideAnchors(
+        val newOverrideAnchors = anchorTransformer.updateOverrideAnchors(
             event = event,
             anchors = uiState.value.overrideStyleAnchors,
             editorConfig = oldEditorConfig,
         )
 
-        val newBaseStyleAnchors = updateBaseStyleAnchors(
+        val newBaseStyleAnchors = anchorTransformer.updateBaseStyleAnchors(
             oldAnchors = uiState.value.baseStyleAnchors,
             insertCursorLine = oldTextFieldValue.getLineAtStartCursor(),
             lineCount = newTextFieldValue.text.lines().size,
@@ -206,7 +202,8 @@ class EditorViewModel(
         mutableUiState.update {
             it.copy(
                 editorConfig = it.editorConfig.copy(isBold = toggledIsBold),
-                overrideStyleAnchors = toggleOverrideStyleOfSelection(
+                overrideStyleAnchors = anchorTransformer.toggleOverrideStyleOfSelection(
+                    currentAnchors = it.overrideStyleAnchors,
                     selection = it.content.selection,
                     overrideStyle = OverrideStyle.Bold(toggledIsBold),
                     overrideAnchors = it.overrideStyleAnchors,
@@ -231,7 +228,8 @@ class EditorViewModel(
         mutableUiState.update {
             it.copy(
                 editorConfig = it.editorConfig.copy(isItalic = toggledIsItalic),
-                overrideStyleAnchors = toggleOverrideStyleOfSelection(
+                overrideStyleAnchors = anchorTransformer.toggleOverrideStyleOfSelection(
+                    currentAnchors = it.overrideStyleAnchors,
                     selection = it.content.selection,
                     overrideStyle = OverrideStyle.Italic(toggledIsItalic),
                     overrideAnchors = it.overrideStyleAnchors,
@@ -278,7 +276,8 @@ class EditorViewModel(
                 editorConfig = uiState.editorConfig.copy(
                     color = color,
                 ),
-                overrideStyleAnchors = toggleOverrideStyleOfSelection(
+                overrideStyleAnchors = anchorTransformer.toggleOverrideStyleOfSelection(
+                    currentAnchors = uiState.overrideStyleAnchors,
                     selection = uiState.content.selection,
                     overrideStyle = OverrideStyle.Color(color),
                     overrideAnchors = uiState.overrideStyleAnchors,
@@ -315,128 +314,6 @@ class EditorViewModel(
         mutableUiState.update { it.copy(showSelectBaseStyleDialog = false) }
     }
 
-    /**
-     * update override style anchors
-     * @param event [TextFieldValue] change event
-     * @param anchors current override style anchors
-     * @param editorConfig active editor configuration
-     */
-    private fun updateOverrideAnchors(
-        event: TextFieldChangeEvent,
-        anchors: List<OverrideStyleAnchor>,
-        editorConfig: EditorConfig,
-    ) = when (event) {
-        is TextFieldChangeEvent.Insert -> {
-            anchors
-                .splitAt(event.position)
-                .shiftToRight(
-                    baseOffset = event.position,
-                    shiftOffset = event.length,
-                ) + generateAnchorsToInsert(
-                editorConfig = editorConfig,
-                insertPos = event.position,
-                length = event.length,
-            )
-        }
-
-        is TextFieldChangeEvent.Delete -> {
-            anchors.shiftToLeft(
-                baseOffset = event.position,
-                shiftOffset = event.length,
-            )
-        }
-
-        is TextFieldChangeEvent.Replace -> {
-            anchors
-                // 選択部分の削除
-                .splitAt(event.oldValue.selection.start)
-                .splitAt(event.oldValue.selection.end)
-                .filterNot { it.start in event.oldValue.selection && it.end in event.oldValue.selection }
-                .shiftToLeft(
-                    baseOffset = event.position,
-                    shiftOffset = event.deletedText.length,
-                )
-                .shiftToRight(
-                    baseOffset = event.position,
-                    shiftOffset = event.insertedText.length,
-                )
-        }
-
-        else -> anchors
-    }.filter { it.isValid() }.optimize()
-
-    private fun updateBaseStyleAnchors(
-        oldAnchors: List<BaseStyleAnchor>,
-        insertCursorLine: Int,
-        lineCount: Int,
-        event: TextFieldChangeEvent,
-        insertionBaseStyle: BaseStyle,
-    ) = when (event) {
-        is TextFieldChangeEvent.Insert -> {
-            oldAnchors.insertNewAnchorsAndShiftDown(
-                baseStyle = insertionBaseStyle,
-                insertCursorLine = insertCursorLine,
-                insertLines = event.insertedText.count { it == '\n' }
-            )
-        }
-
-        is TextFieldChangeEvent.Delete -> {
-            oldAnchors.deleteLinesAndShiftUp(
-                deleteCursorLine = insertCursorLine,
-                deleteLines = event.deletedText.count { it == '\n' }
-            )
-        }
-
-        is TextFieldChangeEvent.Replace -> {
-            oldAnchors
-                .deleteLinesAndShiftUp(
-                    deleteCursorLine = insertCursorLine,
-                    deleteLines = event.deletedText.count { it == '\n' }
-                )
-                .insertNewAnchorsAndShiftDown(
-                    baseStyle = insertionBaseStyle,
-                    insertCursorLine = insertCursorLine,
-                    insertLines = event.insertedText.count { it == '\n' }
-                )
-        }
-
-        else -> oldAnchors
-    }.filter { it.isValid(lineCount) }.distinctBy { it.line }
-
-    private fun generateAnchorsToInsert(
-        editorConfig: EditorConfig,
-        insertPos: Int,
-        length: Int,
-    ): List<OverrideStyleAnchor> {
-        val anchorsToInsert = mutableListOf<OverrideStyleAnchor>()
-        if (editorConfig.isBold) {
-            anchorsToInsert.add(
-                OverrideStyleAnchor(
-                    start = insertPos,
-                    end = insertPos + length,
-                    style = OverrideStyle.Bold(true),
-                )
-            )
-        }
-        if (editorConfig.isItalic) {
-            anchorsToInsert.add(
-                OverrideStyleAnchor(
-                    start = insertPos,
-                    end = insertPos + length,
-                    style = OverrideStyle.Italic(true),
-                )
-            )
-        }
-        anchorsToInsert.add(
-            OverrideStyleAnchor(
-                start = insertPos,
-                end = insertPos + length,
-                style = OverrideStyle.Color(editorConfig.color),
-            )
-        )
-        return anchorsToInsert
-    }
-
     private fun recalculateEditorConfig(
         editorConfig: EditorConfig,
         cursorPos: Int,
@@ -453,44 +330,6 @@ class EditorViewModel(
             isItalic = activeOverrideAnchors.any { it.style is OverrideStyle.Italic },
             color = (activeOverrideAnchors.find { it.style is OverrideStyle.Color }?.style as? OverrideStyle.Color)?.color ?: editorConfig.color
         )
-    }
-
-    private fun toggleOverrideStyleOfSelection(
-        selection: TextRange,
-        overrideStyle: OverrideStyle,
-        overrideAnchors: List<OverrideStyleAnchor>,
-    ): List<OverrideStyleAnchor> {
-        if (selection.collapsed) return overrideAnchors
-        val orderedSelection = selection.toValidOrder()
-        val newAnchors = uiState.value.overrideStyleAnchors
-            .splitAt(orderedSelection.start)
-            .splitAt(orderedSelection.end)
-            .filterNot {
-                (it.start >= orderedSelection.start)
-                    && (it.end <= orderedSelection.end)
-                    && (it.style::class == overrideStyle::class)
-            } + listOf(
-            OverrideStyleAnchor(
-                start = orderedSelection.start,
-                end = orderedSelection.end,
-                style = overrideStyle,
-            )
-        )
-        return newAnchors
-    }
-
-    private fun TextFieldValue.getLineAtStartCursor(): Int {
-        val cursorPosition = this.selection.start
-        if (cursorPosition == 0) return 0
-        val textBeforeCursor = this.text.substring(0, cursorPosition)
-        return textBeforeCursor.count { it == '\n' }
-    }
-
-    private fun TextFieldValue.getLineAtEndCursor(): Int {
-        val cursorPosition = this.selection.end
-        if (cursorPosition == 0) return 0
-        val textBeforeCursor = this.text.substring(0, cursorPosition)
-        return textBeforeCursor.count { it == '\n' }
     }
 
     fun redo() {
