@@ -1,5 +1,6 @@
 package com.github.kitakkun.noteapp.editor.usecase
 
+import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import com.github.kitakkun.noteapp.data.model.BaseStyle
@@ -67,7 +68,8 @@ class AnchorTransformer {
         else -> anchors
     }.filter { it.isValid() }.optimize()
 
-    private fun generateAnchorsToInsert(
+    @VisibleForTesting
+    fun generateAnchorsToInsert(
         editorConfig: EditorConfig,
         insertPos: Int,
         length: Int,
