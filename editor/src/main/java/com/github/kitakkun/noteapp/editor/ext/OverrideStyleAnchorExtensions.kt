@@ -93,6 +93,14 @@ fun List<OverrideStyleAnchor>.optimize(): List<OverrideStyleAnchor> {
     return optimizeStack
 }
 
+fun List<OverrideStyleAnchor>.optimizeRecursively(): List<OverrideStyleAnchor> {
+    val optimized = optimize()
+    if (optimized.size == size) {
+        return optimized
+    }
+    return optimized.optimizeRecursively()
+}
+
 internal fun List<OverrideStyleAnchor>.sortToOptimize() = this.sortedWith(
     compareBy<OverrideStyleAnchor> { it.start }
         .thenBy { anchor ->
