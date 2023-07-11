@@ -24,6 +24,24 @@ private fun OverrideStyleAnchor.split(at: Int) = listOf(
     copy(start = at, end = end),
 )
 
+internal fun List<OverrideStyleAnchor>.shift(
+    shiftOffset: Int,
+    shouldShiftEnd: (OverrideStyleAnchor) -> Boolean,
+    shouldShiftStart: (OverrideStyleAnchor) -> Boolean,
+) = map { anchor ->
+    val newStart = if (shouldShiftStart(anchor)) {
+        anchor.start + shiftOffset
+    } else {
+        anchor.start
+    }
+    val newEnd = if (shouldShiftEnd(anchor)) {
+        anchor.end + shiftOffset
+    } else {
+        anchor.end
+    }
+    anchor.copy(start = newStart, end = newEnd)
+}
+
 /**
  * shift the anchor to the left by the given offset
  * @param baseOffset the base offset to shift the anchor from
@@ -32,13 +50,11 @@ private fun OverrideStyleAnchor.split(at: Int) = listOf(
 fun List<OverrideStyleAnchor>.shiftToLeft(
     baseOffset: Int,
     shiftOffset: Int,
-) = map {
-    shiftAnchorLeft(
-        anchor = it,
-        baseline = baseOffset,
-        shiftOffset = shiftOffset
-    )
-}
+) = shift(
+    shiftOffset = -shiftOffset,
+    shouldShiftEnd = { it.end >= baseOffset },
+    shouldShiftStart = { it.start >= baseOffset },
+)
 
 /**
  * shift the anchor to the right by the given offset
@@ -48,44 +64,11 @@ fun List<OverrideStyleAnchor>.shiftToLeft(
 fun List<OverrideStyleAnchor>.shiftToRight(
     baseOffset: Int,
     shiftOffset: Int,
-) = map { anchor ->
-    shiftAnchorRight(
-        anchor = anchor,
-        baseOffset = baseOffset,
-        shiftOffset = shiftOffset,
-    )
-}
-
-private fun shiftAnchorLeft(
-    anchor: OverrideStyleAnchor,
-    baseline: Int,
-    shiftOffset: Int,
-): OverrideStyleAnchor {
-    val shouldShiftStart = anchor.start >= baseline
-    val shouldShiftEnd = anchor.end >= baseline
-    val newStart = when (shouldShiftStart) {
-        true -> anchor.start - shiftOffset
-        false -> anchor.start
-    }
-    val newEnd = when (shouldShiftEnd) {
-        true -> anchor.end - shiftOffset
-        false -> anchor.end
-    }
-    return anchor.copy(start = newStart, end = newEnd)
-}
-
-private fun shiftAnchorRight(
-    anchor: OverrideStyleAnchor,
-    baseOffset: Int,
-    shiftOffset: Int,
-) = when (anchor.start >= baseOffset) {
-    true -> anchor.copy(
-        start = anchor.start + shiftOffset,
-        end = anchor.end + shiftOffset,
-    )
-
-    false -> anchor
-}
+) = shift(
+    shiftOffset = shiftOffset,
+    shouldShiftEnd = { it.end >= baseOffset },
+    shouldShiftStart = { it.start >= baseOffset },
+)
 
 fun List<OverrideStyleAnchor>.optimize(): List<OverrideStyleAnchor> {
     // まず、要素を始点とスタイルの種類でソートします
