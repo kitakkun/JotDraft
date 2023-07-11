@@ -67,8 +67,12 @@ fun List<OverrideStyleAnchor>.shiftToRight(
     shiftOffset: Int,
 ) = shift(
     shiftOffset = shiftOffset,
-    shouldShiftEnd = { it.end >= baseOffset },
-    shouldShiftStart = { it.start >= baseOffset },
+    shouldShiftEnd = { it.end > baseOffset },
+    shouldShiftStart = { it.start > baseOffset },
+    // needs to be exclusive
+    // because this method is used for insertion of text.
+    // this is highly depending on the implementation of the editor
+    // and may need to be changed in the future.
 )
 
 fun List<OverrideStyleAnchor>.optimize(): List<OverrideStyleAnchor> {
