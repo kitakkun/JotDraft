@@ -81,7 +81,7 @@ fun List<OverrideStyleAnchor>.optimize(): List<OverrideStyleAnchor> {
             continue
         }
         val prevAnchor = optimizeStack.peek()
-        val canMerge = prevAnchor.style == anchor.style && prevAnchor.end == anchor.start
+        val canMerge = prevAnchor.style == anchor.style && anchor.start <= prevAnchor.end
         if (canMerge) {
             optimizeStack.pop()
             optimizeStack.add(prevAnchor.copy(end = anchor.end))
