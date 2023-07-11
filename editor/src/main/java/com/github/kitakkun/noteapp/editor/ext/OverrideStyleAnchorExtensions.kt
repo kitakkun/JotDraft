@@ -102,15 +102,14 @@ fun List<OverrideStyleAnchor>.optimizeRecursively(): List<OverrideStyleAnchor> {
 }
 
 internal fun List<OverrideStyleAnchor>.sortToOptimize() = this.sortedWith(
-    compareBy<OverrideStyleAnchor> { it.start }
-        .thenBy { anchor ->
-            when (anchor.style) {
-                is OverrideStyle.Bold -> 0
-                is OverrideStyle.Italic -> 1
-                is OverrideStyle.Color -> 2
-                else -> 3
-            }
+    compareBy<OverrideStyleAnchor> { anchor ->
+        when (anchor.style) {
+            is OverrideStyle.Bold -> 0
+            is OverrideStyle.Italic -> 1
+            is OverrideStyle.Color -> 2
+            else -> 3
         }
+    }.thenBy { anchor -> anchor.start }
 )
 
 fun List<OverrideStyleAnchor>.optimize(range: IntRange): List<OverrideStyleAnchor> {
