@@ -39,14 +39,14 @@ class AnchorTransformer {
                 editorConfig = editorConfig,
                 insertPos = event.position,
                 length = event.length,
-            ).optimizeRecursively(range = IntRange(event.position, event.position + event.length))
+            )
         }
 
         is TextFieldChangeEvent.Delete -> {
             anchors.shiftToLeft(
                 baseOffset = event.position,
                 shiftOffset = event.length,
-            ).optimizeRecursively(range = IntRange(event.position - event.length, event.position))
+            )
         }
 
         is TextFieldChangeEvent.Replace -> {
@@ -63,12 +63,14 @@ class AnchorTransformer {
                     baseOffset = event.position,
                     shiftOffset = event.insertedText.length,
                 )
-                // TODO: need to be check if this logic is correct
-                .optimizeRecursively(range = IntRange(event.position, event.position + event.insertedText.length))
         }
 
         else -> anchors
     }.filter { it.isValid() }
+        .optimizeRecursively()
+    /* FIXME: should be changed because it is heavy operation.
+    *   Depending on the event, it may be possible to optimize only the changed part.
+    */
 
     @VisibleForTesting
     fun generateAnchorsToInsert(
