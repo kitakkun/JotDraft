@@ -2,6 +2,7 @@ package com.github.kitakkun.noteapp.editor.ext
 
 import com.github.kitakkun.noteapp.data.model.OverrideStyle
 import com.github.kitakkun.noteapp.data.model.OverrideStyleAnchor
+import java.util.Stack
 
 /**
  * split anchor into two anchors at the given offset.
@@ -24,6 +25,24 @@ private fun OverrideStyleAnchor.split(at: Int) = listOf(
     copy(start = at, end = end),
 )
 
+internal fun List<OverrideStyleAnchor>.shift(
+    shiftOffset: Int,
+    shouldShiftEnd: (OverrideStyleAnchor) -> Boolean,
+    shouldShiftStart: (OverrideStyleAnchor) -> Boolean,
+) = map { anchor ->
+    val newStart = if (shouldShiftStart(anchor)) {
+        anchor.start + shiftOffset
+    } else {
+        anchor.start
+    }
+    val newEnd = if (shouldShiftEnd(anchor)) {
+        anchor.end + shiftOffset
+    } else {
+        anchor.end
+    }
+    anchor.copy(start = newStart, end = newEnd)
+}
+
 /**
  * shift the anchor to the left by the given offset
  * @param baseOffset the base offset to shift the anchor from
@@ -32,13 +51,11 @@ private fun OverrideStyleAnchor.split(at: Int) = listOf(
 fun List<OverrideStyleAnchor>.shiftToLeft(
     baseOffset: Int,
     shiftOffset: Int,
-) = map {
-    shiftAnchorLeft(
-        anchor = it,
-        baseline = baseOffset,
-        shiftOffset = shiftOffset
-    )
-}
+) = shift(
+    shiftOffset = -shiftOffset,
+    shouldShiftEnd = { it.end >= baseOffset },
+    shouldShiftStart = { it.start >= baseOffset },
+)
 
 /**
  * shift the anchor to the right by the given offset
@@ -48,77 +65,69 @@ fun List<OverrideStyleAnchor>.shiftToLeft(
 fun List<OverrideStyleAnchor>.shiftToRight(
     baseOffset: Int,
     shiftOffset: Int,
-) = map { anchor ->
-    shiftAnchorRight(
-        anchor = anchor,
-        baseOffset = baseOffset,
-        shiftOffset = shiftOffset,
-    )
-}
-
-private fun shiftAnchorLeft(
-    anchor: OverrideStyleAnchor,
-    baseline: Int,
-    shiftOffset: Int,
-): OverrideStyleAnchor {
-    val shouldShiftStart = anchor.start >= baseline
-    val shouldShiftEnd = anchor.end >= baseline
-    val newStart = when (shouldShiftStart) {
-        true -> anchor.start - shiftOffset
-        false -> anchor.start
-    }
-    val newEnd = when (shouldShiftEnd) {
-        true -> anchor.end - shiftOffset
-        false -> anchor.end
-    }
-    return anchor.copy(start = newStart, end = newEnd)
-}
-
-private fun shiftAnchorRight(
-    anchor: OverrideStyleAnchor,
-    baseOffset: Int,
-    shiftOffset: Int,
-) = when (anchor.start >= baseOffset) {
-    true -> anchor.copy(
-        start = anchor.start + shiftOffset,
-        end = anchor.end + shiftOffset,
-    )
-
-    false -> anchor
-}
+) = shift(
+    shiftOffset = shiftOffset,
+    shouldShiftEnd = { it.end > baseOffset },
+    shouldShiftStart = { it.start > baseOffset },
+    // needs to be exclusive
+    // because this method is used for insertion of text.
+    // this is highly depending on the implementation of the editor
+    // and may need to be changed in the future.
+)
 
 fun List<OverrideStyleAnchor>.optimize(): List<OverrideStyleAnchor> {
-    // まず、要素を始点とスタイルの種類でソートします
-    val sorted = this.sortedWith(
-        compareBy<OverrideStyleAnchor> { it.start }
-            .thenBy {
-                when (it.style) {
-                    is OverrideStyle.Bold -> 0
-                    is OverrideStyle.Italic -> 1
-                    else -> 2
-                }
-            }
-    )
+    val sortedAnchors = this.sortToOptimize()
+    val optimizeStack = Stack<OverrideStyleAnchor>()
 
-    // 最適化後のリストを保持するための変数を用意します
-    val optimized = mutableListOf<OverrideStyleAnchor>()
-
-    // ソートされたリストを反復処理します
-    for (anchor in sorted) {
-        // 最適化後のリストが空でないかつ、直前の要素と現在の要素が結合可能な場合
-        if (optimized.isNotEmpty() &&
-            optimized.last().style == anchor.style &&
-            optimized.last().end == anchor.start
-        ) {
-
-            // 直前の要素を新しい範囲で更新します
-            val last = optimized.removeLast()
-            optimized.add(last.copy(end = anchor.end))
+    for (anchor in sortedAnchors) {
+        if (optimizeStack.isEmpty()) {
+            optimizeStack.add(anchor)
+            continue
+        }
+        val prevAnchor = optimizeStack.peek()
+        val canMerge = prevAnchor.style == anchor.style && anchor.start <= prevAnchor.end
+        if (canMerge) {
+            optimizeStack.pop()
+            optimizeStack.add(prevAnchor.copy(end = anchor.end))
         } else {
-            // それ以外の場合は現在の要素を最適化後のリストに追加します
-            optimized.add(anchor)
+            optimizeStack.add(anchor)
         }
     }
 
-    return optimized
+    return optimizeStack
+}
+
+fun List<OverrideStyleAnchor>.optimizeRecursively(): List<OverrideStyleAnchor> {
+    val optimized = optimize()
+    if (optimized.size == size) {
+        return optimized
+    }
+    return optimized.optimizeRecursively()
+}
+
+internal fun List<OverrideStyleAnchor>.sortToOptimize() = this.sortedWith(
+    compareBy<OverrideStyleAnchor> { anchor ->
+        when (anchor.style) {
+            is OverrideStyle.Bold -> 0
+            is OverrideStyle.Italic -> 1
+            is OverrideStyle.Color -> 2
+            else -> 3
+        }
+    }.thenBy { anchor -> anchor.start }
+)
+
+fun List<OverrideStyleAnchor>.optimize(range: IntRange): List<OverrideStyleAnchor> {
+    val nonTargets = filter { anchor -> anchor.start !in range && anchor.end !in range }
+    // toSet() is just for improving performance(suggested by IDE)
+    val targets = this - nonTargets.toSet()
+    val optimizedTargets = targets.optimize()
+    return nonTargets + optimizedTargets
+}
+
+fun List<OverrideStyleAnchor>.optimizeRecursively(range: IntRange): List<OverrideStyleAnchor> {
+    val optimized = optimize(range)
+    if (optimized.size == size) {
+        return optimized
+    }
+    return optimized.optimizeRecursively(range)
 }

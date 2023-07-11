@@ -41,4 +41,7 @@ dependencies {
     implementation(libs.koin.android)
 
     implementation(libs.colorpicker.compose)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.junit.ext)
 }

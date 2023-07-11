@@ -1,5 +1,6 @@
 package com.github.kitakkun.noteapp.editor.usecase
 
+import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import com.github.kitakkun.noteapp.data.model.BaseStyle
@@ -10,7 +11,7 @@ import com.github.kitakkun.noteapp.editor.editmodel.EditorConfig
 import com.github.kitakkun.noteapp.editor.editmodel.TextFieldChangeEvent
 import com.github.kitakkun.noteapp.editor.ext.deleteLinesAndShiftUp
 import com.github.kitakkun.noteapp.editor.ext.insertNewAnchorsAndShiftDown
-import com.github.kitakkun.noteapp.editor.ext.optimize
+import com.github.kitakkun.noteapp.editor.ext.optimizeRecursively
 import com.github.kitakkun.noteapp.editor.ext.shiftToLeft
 import com.github.kitakkun.noteapp.editor.ext.shiftToRight
 import com.github.kitakkun.noteapp.editor.ext.splitAt
@@ -65,9 +66,14 @@ class AnchorTransformer {
         }
 
         else -> anchors
-    }.filter { it.isValid() }.optimize()
+    }.filter { it.isValid() }
+        .optimizeRecursively()
+    /* FIXME: should be changed because it is heavy operation.
+    *   Depending on the event, it may be possible to optimize only the changed part.
+    */
 
-    private fun generateAnchorsToInsert(
+    @VisibleForTesting
+    fun generateAnchorsToInsert(
         editorConfig: EditorConfig,
         insertPos: Int,
         length: Int,
