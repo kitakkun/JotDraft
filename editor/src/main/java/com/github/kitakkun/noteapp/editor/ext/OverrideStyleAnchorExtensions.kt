@@ -114,8 +114,17 @@ internal fun List<OverrideStyleAnchor>.sortToOptimize() = this.sortedWith(
 )
 
 fun List<OverrideStyleAnchor>.optimize(range: IntRange): List<OverrideStyleAnchor> {
-    val nonTargets = filter { it.start !in range || it.end !in range }
-    val targets = filter { it.start in range && it.end in range }
+    val nonTargets = filter { anchor -> anchor.start !in range && anchor.end !in range }
+    // toSet() is just for improving performance(suggested by IDE)
+    val targets = this - nonTargets.toSet()
     val optimizedTargets = targets.optimize()
     return nonTargets + optimizedTargets
+}
+
+fun List<OverrideStyleAnchor>.optimizeRecursively(range: IntRange): List<OverrideStyleAnchor> {
+    val optimized = optimize(range)
+    if (optimized.size == size) {
+        return optimized
+    }
+    return optimized.optimizeRecursively(range)
 }

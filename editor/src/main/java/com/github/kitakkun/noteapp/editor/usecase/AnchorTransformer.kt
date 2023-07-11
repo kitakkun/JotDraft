@@ -11,7 +11,7 @@ import com.github.kitakkun.noteapp.editor.editmodel.EditorConfig
 import com.github.kitakkun.noteapp.editor.editmodel.TextFieldChangeEvent
 import com.github.kitakkun.noteapp.editor.ext.deleteLinesAndShiftUp
 import com.github.kitakkun.noteapp.editor.ext.insertNewAnchorsAndShiftDown
-import com.github.kitakkun.noteapp.editor.ext.optimize
+import com.github.kitakkun.noteapp.editor.ext.optimizeRecursively
 import com.github.kitakkun.noteapp.editor.ext.shiftToLeft
 import com.github.kitakkun.noteapp.editor.ext.shiftToRight
 import com.github.kitakkun.noteapp.editor.ext.splitAt
@@ -39,14 +39,14 @@ class AnchorTransformer {
                 editorConfig = editorConfig,
                 insertPos = event.position,
                 length = event.length,
-            )
+            ).optimizeRecursively(range = IntRange(event.position, event.position + event.length))
         }
 
         is TextFieldChangeEvent.Delete -> {
             anchors.shiftToLeft(
                 baseOffset = event.position,
                 shiftOffset = event.length,
-            )
+            ).optimizeRecursively(range = IntRange(event.position - event.length, event.position))
         }
 
         is TextFieldChangeEvent.Replace -> {
@@ -63,10 +63,12 @@ class AnchorTransformer {
                     baseOffset = event.position,
                     shiftOffset = event.insertedText.length,
                 )
+                // TODO: need to be check if this logic is correct
+                .optimizeRecursively(range = IntRange(event.position, event.position + event.insertedText.length))
         }
 
         else -> anchors
-    }.filter { it.isValid() }.optimize()
+    }.filter { it.isValid() }
 
     @VisibleForTesting
     fun generateAnchorsToInsert(
