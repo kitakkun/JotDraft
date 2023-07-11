@@ -2,6 +2,7 @@ package com.github.kitakkun.noteapp.editor.ext
 
 import com.github.kitakkun.noteapp.data.model.OverrideStyle
 import com.github.kitakkun.noteapp.data.model.OverrideStyleAnchor
+import java.util.Stack
 
 /**
  * split anchor into two anchors at the given offset.
@@ -71,37 +72,42 @@ fun List<OverrideStyleAnchor>.shiftToRight(
 )
 
 fun List<OverrideStyleAnchor>.optimize(): List<OverrideStyleAnchor> {
-    // まず、要素を始点とスタイルの種類でソートします
-    val sorted = this.sortedWith(
-        compareBy<OverrideStyleAnchor> { it.start }
-            .thenBy {
-                when (it.style) {
-                    is OverrideStyle.Bold -> 0
-                    is OverrideStyle.Italic -> 1
-                    else -> 2
-                }
-            }
-    )
+    val sortedAnchors = this.sortToOptimize()
+    val optimizeStack = Stack<OverrideStyleAnchor>()
 
-    // 最適化後のリストを保持するための変数を用意します
-    val optimized = mutableListOf<OverrideStyleAnchor>()
-
-    // ソートされたリストを反復処理します
-    for (anchor in sorted) {
-        // 最適化後のリストが空でないかつ、直前の要素と現在の要素が結合可能な場合
-        if (optimized.isNotEmpty() &&
-            optimized.last().style == anchor.style &&
-            optimized.last().end == anchor.start
-        ) {
-
-            // 直前の要素を新しい範囲で更新します
-            val last = optimized.removeLast()
-            optimized.add(last.copy(end = anchor.end))
+    for (anchor in sortedAnchors) {
+        if (optimizeStack.isEmpty()) {
+            optimizeStack.add(anchor)
+            continue
+        }
+        val prevAnchor = optimizeStack.peek()
+        val canMerge = prevAnchor.style == anchor.style && prevAnchor.end == anchor.start
+        if (canMerge) {
+            optimizeStack.pop()
+            optimizeStack.add(prevAnchor.copy(end = anchor.end))
         } else {
-            // それ以外の場合は現在の要素を最適化後のリストに追加します
-            optimized.add(anchor)
+            optimizeStack.add(anchor)
         }
     }
 
-    return optimized
+    return optimizeStack
+}
+
+internal fun List<OverrideStyleAnchor>.sortToOptimize() = this.sortedWith(
+    compareBy<OverrideStyleAnchor> { it.start }
+        .thenBy { anchor ->
+            when (anchor.style) {
+                is OverrideStyle.Bold -> 0
+                is OverrideStyle.Italic -> 1
+                is OverrideStyle.Color -> 2
+                else -> 3
+            }
+        }
+)
+
+fun List<OverrideStyleAnchor>.optimize(range: IntRange): List<OverrideStyleAnchor> {
+    val nonTargets = filter { it.start !in range || it.end !in range }
+    val targets = filter { it.start in range && it.end in range }
+    val optimizedTargets = targets.optimize()
+    return nonTargets + optimizedTargets
 }
