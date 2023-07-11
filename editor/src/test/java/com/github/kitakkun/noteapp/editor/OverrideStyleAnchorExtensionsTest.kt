@@ -3,6 +3,7 @@ package com.github.kitakkun.noteapp.editor
 import com.github.kitakkun.noteapp.data.model.OverrideStyle
 import com.github.kitakkun.noteapp.data.model.OverrideStyleAnchor
 import com.github.kitakkun.noteapp.data.model.StyleColor
+import com.github.kitakkun.noteapp.editor.ext.optimize
 import com.github.kitakkun.noteapp.editor.ext.shiftToLeft
 import com.github.kitakkun.noteapp.editor.ext.shiftToRight
 import com.github.kitakkun.noteapp.editor.ext.splitAt
@@ -62,6 +63,21 @@ class OverrideStyleAnchorExtensionsTest {
             OverrideStyleAnchor(start = 10, end = 18 + shiftOffset, style = OverrideStyle.Bold(enabled = true)),
             OverrideStyleAnchor(start = 15 + shiftOffset, end = 25 + shiftOffset, style = OverrideStyle.Italic(enabled = true)),
             OverrideStyleAnchor(start = 15 + shiftOffset, end = 20 + shiftOffset, style = OverrideStyle.Color(color = StyleColor.Dynamic.Default)),
+        )
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun testOptimize() {
+        val anchors = listOf(
+            OverrideStyleAnchor(start = 10, end = 18, style = OverrideStyle.Bold(enabled = true)),
+            OverrideStyleAnchor(start = 15, end = 25, style = OverrideStyle.Bold(enabled = true)),
+            OverrideStyleAnchor(start = 15, end = 20, style = OverrideStyle.Color(color = StyleColor.Dynamic.Default)),
+        )
+        val actual = anchors.optimize()
+        val expected = listOf(
+            OverrideStyleAnchor(start = 10, end = 25, style = OverrideStyle.Bold(enabled = true)),
+            OverrideStyleAnchor(start = 15, end = 20, style = OverrideStyle.Color(color = StyleColor.Dynamic.Default)),
         )
         assertEquals(expected, actual)
     }
