@@ -1,13 +1,33 @@
-package com.github.kitakkun.noteapp.editor.ext
+package com.github.kitakkun.noteapp.editor.visualtransformation
 
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import com.github.kitakkun.noteapp.data.model.BaseStyleAnchor
 import com.github.kitakkun.noteapp.data.model.OverrideStyle
 import com.github.kitakkun.noteapp.data.model.OverrideStyleAnchor
 import com.github.kitakkun.noteapp.data.model.StyleColor
 
-fun AnnotatedString.applyStyles(
+class RichTextVisualTransformation(
+    private val baseStyleAnchors: List<BaseStyleAnchor>,
+    private val overrideStyleAnchors: List<OverrideStyleAnchor>,
+    private val isDarkTheme: Boolean,
+) : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        return TransformedText(
+            text = text.applyStyles(
+                baseStyleAnchors = baseStyleAnchors,
+                overrideStyleAnchors = overrideStyleAnchors,
+                isDarkTheme = isDarkTheme,
+            ),
+            offsetMapping = OffsetMapping.Identity,
+        )
+    }
+}
+
+private fun AnnotatedString.applyStyles(
     baseStyleAnchors: List<BaseStyleAnchor>,
     overrideStyleAnchors: List<OverrideStyleAnchor>,
     isDarkTheme: Boolean,
@@ -20,27 +40,30 @@ fun AnnotatedString.applyStyles(
      * so if the style is applied in the wrong order,
      * it will result in a crash
      */
-    baseStyleAnchors.sortedBy { it.line }.forEach {
-        val isLastLine = it.line == text.lines().size - 1
+    val lines = text.lines()
+    val lineCount = text.lines().size
+    baseStyleAnchors.sortedBy { it.lineNumber }.forEach { anchor ->
+        val lineContent = lines[anchor.lineNumber]
+        val leadingLines = lines.take(anchor.lineNumber)
         // +1 for the line break
-        val start = text.lines().take(it.line).sumOf { line -> line.length + 1 }
+        val startOffset = leadingLines.sumOf { line -> line.length + 1 }
         // if it is not the last line, add 1 for the line break
-        val end = if (isLastLine) {
-            start + text.lines()[it.line].length
-        } else {
-            start + text.lines()[it.line].length + 1
+        val endOffset = when (anchor.lineNumber == lineCount - 1) {
+            true -> startOffset + lineContent.length
+            false -> startOffset + lineContent.length + 1
         }
         addStyle(
-            style = it.style.spanStyle,
-            start = start,
-            end = end,
+            style = anchor.style.spanStyle,
+            start = startOffset,
+            end = endOffset,
         )
         addStyle(
-            style = it.style.paragraphStyle,
-            start = start,
-            end = end,
+            style = anchor.style.paragraphStyle,
+            start = startOffset,
+            end = endOffset,
         )
     }
+
     overrideStyleAnchors.forEach { anchor ->
         if (anchor.style !is OverrideStyle.Color) {
             addStyle(
@@ -54,10 +77,9 @@ fun AnnotatedString.applyStyles(
         when (style.color) {
             is StyleColor.Dynamic -> {
                 addStyle(
-                    style = if (isDarkTheme) {
-                        style.darkThemeSpanStyle
-                    } else {
-                        style.spanStyle
+                    style = when (isDarkTheme) {
+                        true -> style.darkThemeSpanStyle
+                        false -> style.spanStyle
                     },
                     start = anchor.start,
                     end = anchor.end

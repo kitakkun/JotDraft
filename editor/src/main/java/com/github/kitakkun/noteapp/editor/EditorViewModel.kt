@@ -243,14 +243,14 @@ class EditorViewModel(
         val endCursorLine = uiState.value.content.getLineAtEndCursor()
         val insertAnchors = (startCursorLine..endCursorLine).map {
             BaseStyleAnchor(
-                line = it,
+                lineNumber = it,
                 style = baseStyle,
             )
         }
         mutableUiState.update {
             it.copy(
                 editorConfig = it.editorConfig.copy(baseStyle = baseStyle),
-                baseStyleAnchors = (insertAnchors + it.baseStyleAnchors).distinctBy { it.line },
+                baseStyleAnchors = (insertAnchors + it.baseStyleAnchors).distinctBy { it.lineNumber },
             )
         }
     }
@@ -321,7 +321,7 @@ class EditorViewModel(
         overrideAnchors: List<OverrideStyleAnchor>,
         baseAnchors: List<BaseStyleAnchor>,
     ): EditorConfig {
-        val baseStyle = baseAnchors.find { it.line == linePos }?.style
+        val baseStyle = baseAnchors.find { it.lineNumber == linePos }?.style
         val activeOverrideAnchors =
             overrideAnchors.filter { it.start < cursorPos && cursorPos <= it.end }
         return editorConfig.copy(
