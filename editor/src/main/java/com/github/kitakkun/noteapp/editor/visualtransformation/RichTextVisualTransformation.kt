@@ -42,13 +42,13 @@ private fun AnnotatedString.applyStyles(
      */
     val lines = text.lines()
     val lineCount = text.lines().size
-    baseStyleAnchors.sortedBy { it.line }.forEach { anchor ->
-        val lineContent = lines[anchor.line]
-        val leadingLines = lines.take(anchor.line)
+    baseStyleAnchors.sortedBy { it.lineNumber }.forEach { anchor ->
+        val lineContent = lines[anchor.lineNumber]
+        val leadingLines = lines.take(anchor.lineNumber)
         // +1 for the line break
         val startOffset = leadingLines.sumOf { line -> line.length + 1 }
         // if it is not the last line, add 1 for the line break
-        val endOffset = when (anchor.line == lineCount - 1) {
+        val endOffset = when (anchor.lineNumber == lineCount - 1) {
             true -> startOffset + lineContent.length
             false -> startOffset + lineContent.length + 1
         }

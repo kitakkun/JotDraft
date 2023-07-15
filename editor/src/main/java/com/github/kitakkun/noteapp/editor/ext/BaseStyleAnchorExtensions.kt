@@ -13,12 +13,12 @@ fun List<BaseStyleAnchor>.deleteLinesAndShiftUp(
 ) = this
     // 削除範囲の行に含まれるアンカーを削除
     .filterNot {
-        it.line in deleteCursorLine until deleteCursorLine + deleteLines
+        it.lineNumber in deleteCursorLine until deleteCursorLine + deleteLines
     }
     // 削除位置より下にあったアンカーを上へ移動する
     .map {
-        if (it.line >= deleteCursorLine + deleteLines) {
-            it.copy(line = it.line - deleteLines)
+        if (it.lineNumber >= deleteCursorLine + deleteLines) {
+            it.copy(lineNumber = it.lineNumber - deleteLines)
         } else {
             it
         }
@@ -39,10 +39,10 @@ fun List<BaseStyleAnchor>.insertNewAnchorsAndShiftDown(
     return (newAnchors + this
         // 挿入位置より下にあったアンカーを下へ移動する
         .map {
-            if (it.line >= insertCursorLine) {
-                it.copy(line = it.line + insertLines)
+            if (it.lineNumber >= insertCursorLine) {
+                it.copy(lineNumber = it.lineNumber + insertLines)
             } else {
                 it
             }
-        }).distinctBy { it.line }
+        }).distinctBy { it.lineNumber }
 }

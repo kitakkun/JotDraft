@@ -144,7 +144,7 @@ class AnchorTransformer {
         }
 
         else -> oldAnchors
-    }.filter { it.isValid(lineCount) }.distinctBy { it.line }
+    }.filter { it.isValid(lineCount) }.distinctBy { it.lineNumber }
 
     fun toggleOverrideStyleOfSelection(
         currentAnchors: List<OverrideStyleAnchor>,
