@@ -40,27 +40,30 @@ private fun AnnotatedString.applyStyles(
      * so if the style is applied in the wrong order,
      * it will result in a crash
      */
-    baseStyleAnchors.sortedBy { it.line }.forEach {
-        val isLastLine = it.line == text.lines().size - 1
+    val lines = text.lines()
+    val lineCount = text.lines().size
+    baseStyleAnchors.sortedBy { it.line }.forEach { anchor ->
+        val lineContent = lines[anchor.line]
+        val leadingLines = lines.take(anchor.line)
         // +1 for the line break
-        val start = text.lines().take(it.line).sumOf { line -> line.length + 1 }
+        val startOffset = leadingLines.sumOf { line -> line.length + 1 }
         // if it is not the last line, add 1 for the line break
-        val end = if (isLastLine) {
-            start + text.lines()[it.line].length
-        } else {
-            start + text.lines()[it.line].length + 1
+        val endOffset = when (anchor.line == lineCount - 1) {
+            true -> startOffset + lineContent.length
+            false -> startOffset + lineContent.length + 1
         }
         addStyle(
-            style = it.style.spanStyle,
-            start = start,
-            end = end,
+            style = anchor.style.spanStyle,
+            start = startOffset,
+            end = endOffset,
         )
         addStyle(
-            style = it.style.paragraphStyle,
-            start = start,
-            end = end,
+            style = anchor.style.paragraphStyle,
+            start = startOffset,
+            end = endOffset,
         )
     }
+
     overrideStyleAnchors.forEach { anchor ->
         if (anchor.style !is OverrideStyle.Color) {
             addStyle(
@@ -74,10 +77,9 @@ private fun AnnotatedString.applyStyles(
         when (style.color) {
             is StyleColor.Dynamic -> {
                 addStyle(
-                    style = if (isDarkTheme) {
-                        style.darkThemeSpanStyle
-                    } else {
-                        style.spanStyle
+                    style = when (isDarkTheme) {
+                        true -> style.darkThemeSpanStyle
+                        false -> style.spanStyle
                     },
                     start = anchor.start,
                     end = anchor.end
