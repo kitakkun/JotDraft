@@ -6,9 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.tooling.preview.Preview
 import com.github.kitakkun.noteapp.customview.preview.PreviewContainer
 import com.github.kitakkun.noteapp.data.model.BaseStyle
@@ -19,7 +17,7 @@ import com.github.kitakkun.noteapp.editor.composable.TextStyleControlRow
 import com.github.kitakkun.noteapp.editor.dialog.colorpicker.ColorPickerDialog
 import com.github.kitakkun.noteapp.editor.dialog.colorselect.SelectColorDialog
 import com.github.kitakkun.noteapp.editor.dialog.selectbasedocument.SelectBaseStyleDialog
-import com.github.kitakkun.noteapp.editor.ext.applyStyles
+import com.github.kitakkun.noteapp.editor.visualtransformation.RichTextVisualTransformation
 
 @Composable
 fun EditorView(
@@ -66,8 +64,6 @@ fun EditorView(
         )
     }
 
-    val isDarkTheme = isSystemInDarkTheme()
-
     Scaffold(
         topBar = {
             EditorTopBar(
@@ -90,16 +86,11 @@ fun EditorView(
                 value = uiState.content,
                 showLineNumber = uiState.showLineNumber,
                 onValueChange = onContentChange,
-                visualTransformation = {
-                    TransformedText(
-                        text = it.applyStyles(
-                            baseStyleAnchors = uiState.baseStyleAnchors,
-                            overrideStyleAnchors = uiState.overrideStyleAnchors,
-                            isDarkTheme = isDarkTheme,
-                        ),
-                        offsetMapping = OffsetMapping.Identity,
-                    )
-                },
+                visualTransformation = RichTextVisualTransformation(
+                    baseStyleAnchors = uiState.baseStyleAnchors,
+                    overrideStyleAnchors = uiState.overrideStyleAnchors,
+                    isDarkTheme = isSystemInDarkTheme(),
+                ),
                 modifier = Modifier.weight(1f)
             )
             TextStyleControlRow(

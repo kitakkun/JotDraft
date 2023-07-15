@@ -1,13 +1,33 @@
-package com.github.kitakkun.noteapp.editor.ext
+package com.github.kitakkun.noteapp.editor.visualtransformation
 
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import com.github.kitakkun.noteapp.data.model.BaseStyleAnchor
 import com.github.kitakkun.noteapp.data.model.OverrideStyle
 import com.github.kitakkun.noteapp.data.model.OverrideStyleAnchor
 import com.github.kitakkun.noteapp.data.model.StyleColor
 
-fun AnnotatedString.applyStyles(
+class RichTextVisualTransformation(
+    private val baseStyleAnchors: List<BaseStyleAnchor>,
+    private val overrideStyleAnchors: List<OverrideStyleAnchor>,
+    private val isDarkTheme: Boolean,
+) : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        return TransformedText(
+            text = text.applyStyles(
+                baseStyleAnchors = baseStyleAnchors,
+                overrideStyleAnchors = overrideStyleAnchors,
+                isDarkTheme = isDarkTheme,
+            ),
+            offsetMapping = OffsetMapping.Identity,
+        )
+    }
+}
+
+private fun AnnotatedString.applyStyles(
     baseStyleAnchors: List<BaseStyleAnchor>,
     overrideStyleAnchors: List<OverrideStyleAnchor>,
     isDarkTheme: Boolean,
