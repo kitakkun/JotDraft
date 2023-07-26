@@ -21,7 +21,7 @@ aboutlibraries = "10.8.0"
 
 [libraries]
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
-compose-ui = { module = "androidx.compose.ui:ui" }
+compose-ui = { module = "androidx.compose.ui:ui", version = "1.6.0-alpha02" }
 compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
